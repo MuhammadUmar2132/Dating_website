@@ -1,0 +1,1012 @@
+/* ============================================================
+   Ambassadors page — built to design/membersAmbassador
+   ("24 website" artboards 08 / 15 / 16 / 17)
+   ------------------------------------------------------------
+   The artboards are 1440px wide and export at 3.9535 image px per
+   CSS px, so every number commented "measured" below is a real
+   ink measurement off the PNG divided by that factor.
+
+   A fresh .amb-* namespace on purpose: the old .bb-amb-* rules in
+   bubba.css describe the previous ambassador design and would
+   otherwise have to be fought selector by selector.
+   ============================================================ */
+
+.amb-page {
+  /* Metric-matched against the artboard H1: "Lead the campus launch" inks
+     505.4 x 46 at 48px in the design; Lato renders 497 x 44, every other
+     candidate was 20-40px out. The page carries no serif at all — the
+     headings are the same humanist sans as the body. */
+  --amb-sans: var(--bb-sans, "Lato", system-ui, sans-serif);
+
+  --amb-ink: #0a0a0a;
+  --amb-green: #20452f;
+  --amb-body: #575757;
+  --amb-muted: #777777;
+  --amb-line: #dddddd;
+  --amb-hero-bg: #e7e6e4;
+  --amb-grey-bg: #f9f9f9;
+  --amb-panel: #4b4c4c;
+  --amb-cta-green: #154d3f;
+
+  /* Tabs, the rule under them and the cards all sit on this measure. */
+  --amb-wrap: 1268px;
+  --amb-pad: 24px;
+
+  background: #fff;
+  font-family: var(--amb-sans);
+}
+
+.amb-wrap {
+  width: 100%;
+  max-width: calc(var(--amb-wrap) + var(--amb-pad) * 2);
+  margin-inline: auto;
+  padding-inline: var(--amb-pad);
+}
+
+/* Shared eyebrow: 14px caps, dark green, wide tracking. */
+.amb-eyebrow {
+  margin: 0;
+  font-family: var(--amb-sans);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--amb-green);
+}
+
+.amb-eyebrow--ink {
+  color: var(--amb-ink);
+  font-weight: 600;
+}
+
+.amb-arrow {
+  flex: none;
+  vertical-align: middle;
+}
+
+/* ---------- Hero ------------------------------------------------
+   Hero band is 804px tall in the artboard; the rhythm below is the
+   measured ink positions relative to its top edge (139.6).
+   ---------------------------------------------------------------- */
+
+.amb-hero {
+  background: var(--amb-hero-bg);
+  padding: 136px 0 34px;
+  text-align: center;
+}
+
+.amb-h1 {
+  /* ink 320.7..366.5 → 46.0 tall, which is a 48px face. */
+  margin: 28px 0 0;
+  font-family: var(--amb-sans);
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: 0.008em;
+  color: var(--amb-ink);
+}
+
+.amb-hero-sub {
+  margin: 48px 0 0;
+  font-family: var(--amb-sans);
+  font-size: 15px;
+  line-height: 25px; /* measured 25.3 between the two baselines */
+  color: var(--amb-body);
+}
+
+.amb-hero-sub span {
+  display: block;
+}
+
+/* Stats card — measured 1068 x 165, centred, 103.5 below the sub. */
+.amb-stats {
+  width: 100%;
+  max-width: 1068px;
+  min-height: 165px;
+  margin: 96px auto 0;
+  background: #fff;
+  border-radius: 6px;
+  display: grid;
+  /* Column widths are the measured divider positions, kept as ratios so the
+     card stays faithful while remaining fluid. */
+  grid-template-columns: 241fr 185fr 233fr 226fr 183fr;
+  /* start, not center: the artboard's rows sit at fixed offsets from the card
+     top (value 48.8, label 82.7, note 123.2), and centring absorbed half of
+     every padding change. */
+  align-items: start;
+}
+
+.amb-stat {
+  padding: 43px 18px 30px;
+  text-align: center;
+  border-left: 1px solid var(--amb-line);
+}
+
+.amb-stat:first-child {
+  border-left: 0;
+}
+
+.amb-stat--lead {
+  text-align: left;
+  padding-left: 43px; /* "Top Prize" starts 43px inside the card */
+}
+
+.amb-stat-kicker {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--amb-ink);
+}
+
+.amb-stat-value {
+  margin: 0;
+  font-family: var(--amb-sans);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--amb-ink);
+}
+
+.amb-stat--lead .amb-stat-value {
+  font-size: 32px;
+}
+
+.amb-stat-label {
+  margin: 3px 0 0;
+  font-size: 20px;
+  color: var(--amb-ink);
+}
+
+.amb-stat-note {
+  margin: 16px 0 0;
+  font-size: 11px;
+  color: var(--amb-muted);
+}
+
+.amb-hero-contact,
+.amb-hero-invite {
+  margin: 0;
+  font-size: 14px;
+  color: var(--amb-body);
+}
+
+.amb-hero-contact {
+  margin-top: 107px; /* card bottom → contact ink 837 in the artboard */
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--amb-green);
+}
+
+.amb-heart {
+  width: 16px;
+  height: 15px;
+}
+
+.amb-hero-invite {
+  margin-top: 32px;
+  color: var(--amb-ink);
+}
+
+.amb-hero-login {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: 6px;
+  font-weight: 600;
+  color: var(--amb-ink);
+  text-decoration: none;
+}
+
+/* ---------- Prizes ---------------------------------------------- */
+
+.amb-prizes {
+  background: #fff;
+  padding: 125px 0 0;
+}
+
+.amb-prizes-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.amb-amount {
+  /* ink 1119.5..1168.6 */
+  margin: 34px 0 0;
+  font-family: var(--amb-sans);
+  font-size: 52px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--amb-ink);
+}
+
+.amb-amount-note {
+  margin: 20px 0 0;
+  font-size: 14px;
+  color: var(--amb-body);
+}
+
+/* The perk block is not flush right in the artboard — it stops ~42px short
+   of the card measure, which this margin reproduces. */
+.amb-perk {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 4px;
+  margin-right: 42px;
+}
+
+.amb-perk-badge {
+  flex: none;
+  width: 51px;
+  height: 51px;
+  border-radius: 50%;
+  background: var(--amb-ink);
+  color: #fff;
+  display: grid;
+  place-items: center;
+}
+
+.amb-perk-badge svg {
+  width: 24px;
+  height: 24px;
+}
+
+.amb-perk-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.amb-perk-lead {
+  font-size: 14px;
+  color: var(--amb-body);
+}
+
+.amb-perk-line {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--amb-ink);
+}
+
+/* Tabs ---------------------------------------------------------- */
+
+.amb-tabs-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 53px;
+  border-bottom: 1px solid var(--amb-line);
+}
+
+.amb-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 88px;
+  padding-left: 20px; /* first tab sits 20px inside the measure */
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.amb-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.amb-tab {
+  --amb-underline: transparent;
+  flex: none;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 0 0 28px;
+  margin-bottom: -1px;
+  background: none;
+  border: 0;
+  border-bottom: 3px solid var(--amb-underline);
+  font-family: inherit;
+  font-size: 15px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #636363;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.amb-tab--on {
+  color: #000;
+  font-weight: 500;
+}
+
+/* Circular prev/next, measured 72px with an 18px gap. */
+.amb-tabs-nav {
+  display: flex;
+  gap: 18px;
+  padding-bottom: 35px;
+}
+
+.amb-tabs-nav button {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 1px solid var(--amb-line);
+  background: #fff;
+  color: var(--amb-ink);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.amb-tabs-nav svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* Cards ---------------------------------------------------------
+   Measured: champion 558.5 wide, the other two 340.5, 14px gaps,
+   card height ~408. That is 1.64 : 1 : 1.
+   ---------------------------------------------------------------- */
+
+.amb-cards {
+  display: grid;
+  /* minmax(0,...) not a bare fr: a bare 1fr floors at the track's min-content
+     and the merch shots are wide enough to push the page past a phone's
+     viewport, which threw the whole hero off-centre. */
+  grid-template-columns: minmax(0, 1.64fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+  margin-top: 75px;
+}
+
+.amb-card {
+  min-height: 408px;
+  border-radius: 14px;
+  padding: 30px 34px 34px;
+  display: flex;
+  flex-direction: column;
+}
+
+.amb-card--cash {
+  border: 1px solid var(--amb-line);
+  background: #fff;
+}
+
+.amb-card--champ {
+  border-color: transparent;
+  color: #fff;
+}
+
+.amb-card-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.amb-card-rank {
+  margin: 0;
+  font-size: 17px;
+  letter-spacing: 0.06em;
+  color: #6b6b6b;
+}
+
+.amb-card--champ .amb-card-rank {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.amb-card-champ {
+  margin: 0;
+  font-size: 17px;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.amb-card-amount {
+  margin: auto 0 0;
+  font-family: var(--amb-sans);
+  font-size: 52px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.amb-card--champ .amb-card-amount {
+  color: #fff;
+}
+
+.amb-card-where {
+  margin: 18px 0 0;
+  font-size: 17px;
+  color: var(--amb-body);
+}
+
+.amb-card--champ .amb-card-where {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* Merch cards (tab 01) */
+.amb-card--merch {
+  border: 1px solid var(--amb-line);
+  background: #fff;
+  padding: 26px 30px 24px;
+}
+
+.amb-merch-invites {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--amb-ink);
+}
+
+.amb-card--merch:not(.amb-card--wide) .amb-merch-invites {
+  font-weight: 400;
+  color: #4a4a4a;
+}
+
+.amb-merch-shot {
+  flex: 1 1 auto;
+  display: grid;
+  place-items: center;
+  padding: 12px 0;
+  min-height: 0;
+}
+
+.amb-merch-shot img {
+  max-width: 100%;
+  max-height: 240px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.amb-merch-name {
+  margin: 0;
+  font-size: 17px;
+  color: var(--amb-muted);
+}
+
+.amb-prizes-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 40px;
+  padding: 26px 0 0;
+  border-top: 1px solid var(--amb-line);
+}
+
+.amb-prizes-foot p {
+  margin: 0;
+  font-size: 15px;
+  color: var(--amb-body);
+}
+
+.amb-rules {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--amb-ink);
+  text-decoration: none;
+}
+
+/* ---------- Participation --------------------------------------- */
+
+.amb-part {
+  background: var(--amb-grey-bg);
+  padding: 200px 0 0;
+  margin-top: 64px;
+}
+
+.amb-part-row {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  align-items: start;
+  margin-top: 46px;
+}
+
+.amb-days {
+  margin: 12px 0 0;
+  padding-left: 77px;
+  position: relative;
+  color: #463f3c;
+  line-height: 0.82;
+}
+
+.amb-days-num {
+  font-family: var(--amb-sans);
+  /* ink 2407..2626 → 219.6 tall; Lato digits ink 0.748em → 294px */
+  font-size: 294px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+
+.amb-days-word {
+  position: absolute;
+  left: 169px;
+  bottom: -6px;
+  font-size: 40px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+.amb-part-heading {
+  margin: 0;
+  text-align: center;
+  font-family: var(--amb-sans);
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--amb-ink);
+}
+
+.amb-steps {
+  list-style: none;
+  margin: 52px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.amb-step {
+  position: relative;
+  text-align: center;
+}
+
+.amb-step-link {
+  position: absolute;
+  left: -34px;
+  top: 44px;
+  width: 46px;
+  height: 28px;
+  color: #3c3c3c;
+}
+
+.amb-step-link--down {
+  transform: scaleY(-1);
+}
+
+.amb-step-icon {
+  /* The three icons are different heights in the artboard and line up on
+     their baselines, not their centres. */
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 80px;
+}
+
+.amb-step-icon img {
+  display: block;
+}
+
+.amb-step-title {
+  margin: 38px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--amb-ink);
+}
+
+.amb-step-text {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--amb-body);
+}
+
+.amb-step-text span {
+  display: block;
+}
+
+/* Accordions */
+.amb-panels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 186px;
+}
+
+.amb-panel {
+  background: #fff;
+  border: 1px solid var(--amb-line);
+  border-radius: 12px;
+}
+
+.amb-panel summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 24px 26px;
+}
+
+.amb-panel summary::-webkit-details-marker {
+  display: none;
+}
+
+.amb-panel-icon {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  color: var(--amb-ink);
+}
+
+.amb-panel-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.amb-panel-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.amb-panel-title {
+  display: block;
+  font-size: 17px;
+  color: var(--amb-ink);
+}
+
+.amb-panel-sub {
+  display: block;
+  margin-top: 5px;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--amb-body);
+}
+
+.amb-panel-sub span {
+  display: block;
+}
+
+.amb-chev {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  color: var(--amb-ink);
+  transition: transform 0.18s ease;
+}
+
+.amb-panel[open] .amb-chev {
+  transform: rotate(180deg);
+}
+
+/* ---------- Closing panel --------------------------------------- */
+
+.amb-closer {
+  background: var(--amb-grey-bg);
+  padding: 130px 0 66px;
+}
+
+/* The dark panel keeps its own, wider measure (1320 in the artboard). */
+.amb-closer-wrap {
+  width: 100%;
+  /* Panel spans 59.7..1380.3 in the artboard — 1320 of content, gutter outside. */
+  max-width: calc(1320px + var(--amb-pad) * 2);
+  margin-inline: auto;
+  padding-inline: var(--amb-pad);
+}
+
+.amb-closer-panel {
+  background: var(--amb-panel);
+  border-radius: 18px;
+  color: #fff;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0;
+  padding: 58px 62px 62px;
+}
+
+.amb-closer-left {
+  padding-right: 56px;
+  border-right: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.amb-closer-eyebrow {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.amb-closer-heading {
+  margin: 34px 0 0;
+  font-family: var(--amb-sans);
+  font-size: 38px;
+  font-weight: 400;
+  line-height: 1.32;
+  color: #fff;
+}
+
+.amb-closer-heading span {
+  display: block;
+}
+
+.amb-closer-right {
+  padding-left: 56px;
+}
+
+.amb-closer-title {
+  margin: 0;
+  font-family: var(--amb-sans);
+  font-size: 27px;
+  font-weight: 400;
+  color: #fff;
+}
+
+.amb-closer-body {
+  margin: 22px 0 0;
+  max-width: 470px;
+  font-size: 14px;
+  line-height: 24px;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.amb-closer-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 30px;
+  padding: 18px 34px;
+  border-radius: 999px;
+  background: var(--amb-cta-green);
+  color: #fff;
+  font-size: 17px;
+  text-decoration: none;
+}
+
+.amb-closer-or {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 300px;
+  margin: 28px 0 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.amb-closer-or::before,
+.amb-closer-or::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.amb-closer-alt {
+  margin: 26px 0 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.amb-closer-alt-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+}
+
+/* ============================================================
+   Responsive. There are no mobile artboards in the set, so these
+   breakpoints are a reading of the desktop design rather than a
+   drawing: the page keeps its order and type hierarchy, the
+   multi-column blocks stack, and the tab rail scrolls.
+   ============================================================ */
+
+@media (max-width: 1180px) {
+  .amb-tabs {
+    gap: 56px;
+  }
+
+  .amb-part-row {
+    grid-template-columns: 240px minmax(0, 1fr);
+  }
+
+  .amb-days-num {
+    font-size: 200px;
+  }
+
+  .amb-days-word {
+    left: 50px;
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 980px) {
+  .amb-hero {
+    padding: 78px 0 30px;
+  }
+
+  .amb-h1 {
+    font-size: 36px;
+  }
+
+  .amb-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 56px;
+    min-height: 0;
+  }
+
+  .amb-stat {
+    border-left: 0;
+    border-top: 1px solid var(--amb-line);
+    padding: 22px 16px;
+    text-align: center;
+  }
+
+  .amb-stat--lead {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding-left: 16px;
+    border-top: 0;
+  }
+
+  .amb-hero-contact {
+    margin-top: 56px;
+  }
+
+  .amb-prizes {
+    padding-top: 76px;
+  }
+
+  .amb-prizes-head {
+    flex-direction: column;
+    gap: 34px;
+  }
+
+  .amb-perk {
+    margin-right: 0;
+  }
+
+  .amb-tabs-row {
+    margin-top: 56px;
+  }
+
+  .amb-tabs-nav {
+    display: none; /* the rail scrolls on touch; arrows would duplicate it */
+  }
+
+  .amb-cards {
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 40px;
+  }
+
+  .amb-card {
+    min-height: 0;
+  }
+
+  .amb-card--cash {
+    padding: 26px 26px 30px;
+  }
+
+  .amb-card-amount {
+    margin-top: 46px;
+    font-size: 44px;
+  }
+
+  .amb-part {
+    margin-top: 90px;
+    padding-top: 88px;
+  }
+
+  .amb-part-row {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 8px;
+    margin-top: 34px;
+  }
+
+  .amb-days {
+    text-align: center;
+  }
+
+  .amb-days-num {
+    font-size: 168px;
+  }
+
+  .amb-days-word {
+    position: static;
+    margin-left: 6px;
+    font-size: 30px;
+  }
+
+  .amb-part-heading {
+    font-size: 22px;
+  }
+
+  .amb-steps {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 42px;
+    margin-top: 34px;
+  }
+
+  /* The hand-drawn connectors only make sense across a row. */
+  .amb-step-link {
+    display: none;
+  }
+
+  .amb-panels {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    margin-top: 46px;
+  }
+
+  .amb-closer-panel {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 40px 30px 44px;
+  }
+
+  .amb-closer-left {
+    padding-right: 0;
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+    padding-bottom: 34px;
+  }
+
+  .amb-closer-heading {
+    font-size: 30px;
+    margin-top: 24px;
+  }
+
+  .amb-closer-right {
+    padding-left: 0;
+    padding-top: 34px;
+  }
+}
+
+@media (max-width: 600px) {
+  .amb-page {
+    --amb-pad: 20px;
+  }
+
+  .amb-h1 {
+    font-size: 30px;
+  }
+
+  .amb-hero-sub {
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  .amb-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .amb-stat--lead {
+    padding-bottom: 6px;
+  }
+
+  .amb-amount,
+  .amb-card-amount {
+    font-size: 38px;
+  }
+
+  .amb-tabs {
+    gap: 34px;
+    padding-left: 0;
+  }
+
+  .amb-tab {
+    font-size: 13px;
+  }
+
+  .amb-days-num {
+    font-size: 128px;
+  }
+
+  .amb-part-heading {
+    font-size: 20px;
+  }
+
+  .amb-closer-cta {
+    width: 100%;
+    justify-content: center;
+  }
+}

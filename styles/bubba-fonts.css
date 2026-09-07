@@ -1,0 +1,417 @@
+/* ============================================================
+   Bubba font registration
+   ------------------------------------------------------------
+   Canela and Canela Text resolve from LOCALLY INSTALLED copies
+   only — there is no url() here on purpose. Anyone with the
+   fonts installed (designer, reviewer, you) sees the real thing;
+   nothing is served from the domain, so nothing is redistributed.
+
+   WHEN A COMMERCIAL TYPE WEBFONT LICENCE IS PURCHASED:
+   add the url() line to each block below, e.g.
+       src: local("Canela Medium"),
+            url("/fonts/Canela-Medium.woff2") format("woff2");
+   and drop the licensed .woff2 files into /public/fonts.
+   Nothing else in the codebase needs to change.
+
+   The trial names are listed after the retail names so a machine
+   with only the trials installed still resolves. Note the trials
+   lack & : ; and the em dash.
+   ============================================================ */
+
+/* ---- Canela (display cut) ---- */
+
+/* Thin — CanelaTrial-Thin appears in Bubba Website.ai. No file on disk; the
+   trial installs carry it, so local() is the only way to reach it today. */
+@font-face {
+  font-family: "Canela";
+  src: local("Canela Thin"), local("CanelaTrial-Thin"), local("Canela Trial Thin");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Light — the display cut used for the waitlist intro headline. Only the .otf
+   ships, which browsers load fine; without this face a 300 request fell back to
+   Regular and the headline read heavier than the artboard. */
+@font-face {
+  font-family: "Canela";
+  src: local("Canela Light"), url("/fonts/Canela-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Canela";
+  src: local("Canela Regular"), url("/fonts/Canela-Regular.woff2") format("woff2"), url("/fonts/Canela-Regular-Trial.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Canela";
+  src: local("Canela Medium"), url("/fonts/Canela-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Canela";
+  src: local("Canela Bold"), url("/fonts/Canela-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---- Canela Text (text cut) ---- */
+
+@font-face {
+  font-family: "Canela Text";
+  src: local("Canela Text Regular"), url("/fonts/CanelaText-Regular.woff2") format("woff2"), url("/fonts/CanelaText-Regular-Trial.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Canela Text";
+  src: local("Canela Text Medium"), local("Canela Text Medium Trial"), url("/fonts/CanelaText-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Canela Text";
+  src: local("Canela Text Bold"), url("/fonts/CanelaText-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+/* ---- Lato (SIL OFL) ---- */
+
+@font-face {
+  font-family: "Lato";
+  src: url("/fonts/Lato-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/fonts/Lato-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Semibold — Lato-Semibold is used in Ambassador Onboarding.ai. It is part of
+   the wider retail Lato family, not the 100/300/400/700/900 set Google Fonts
+   serves, and there is no Lato-Semibold.woff2 in public/fonts. Declared so the
+   weight resolves for anyone with the full family installed; otherwise the
+   browser picks the nearest declared weight rather than synthesising one. */
+@font-face {
+  font-family: "Lato";
+  src: local("Lato Semibold"), local("Lato-Semibold"), local("LatoSemibold");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/fonts/Lato-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---- Suisse Intl (trial cut, local installs only) ----
+   Family names below match the per-user installs on this
+   machine ("Suisse Int'l Trial", "Suisse Intl Trial Semibold",
+   ...). No url() here — the trial files are not redistributed. */
+
+@font-face {
+  font-family: "Suisse Intl";
+  src: local("Suisse Int'l Trial"), url("/fonts/SuisseIntl-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Suisse Intl";
+  src: local("SuisseIntl-Medium"), url("/fonts/SuisseIntl-Medium.woff") format("woff"), url("/fonts/SuisseIntlTrial-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Suisse Intl";
+  src: local("Suisse Intl Trial Semibold"), local("SuisseIntl-SemiBold"),
+    local("SuisseIntlTrial-Semibold"), url("/fonts/SuisseIntl-Semibold.woff") format("woff");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Bold — SuisseIntlTrial-Bold appears in Bubba Website.ai. No file on disk. */
+@font-face {
+  font-family: "Suisse Intl";
+  src:
+    local("Suisse Intl Trial Bold"), local("SuisseIntl-Bold"),
+    local("SuisseIntlTrial-Bold"), local("Suisse Int'l Bold");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---- SF Pro Display ---- */
+
+/* Regular (400), Medium (500) and Bold (700) are all self-hosted.
+   Regular and Medium were generated from Apple's official SF Pro package
+   (developer.apple.com/fonts, SF Pro Display v22.0d4e4), subsetted with
+   pyftsubset to exactly the 1299 codepoints the pre-existing Bold already
+   carried — so all three weights have identical character coverage.
+
+   The shipped Bold is the older v13.0d3e20 build, but it is metrically
+   interchangeable with v22: same unitsPerEm (2048), ascent (1950), descent
+   (-494), cap height (1443) and identical advance widths, so it was left in
+   place rather than churned. */
+
+@font-face {
+  font-family: "SF Pro Display";
+  src:
+    local("SF Pro Display Regular"),
+    local("SFProDisplay-Regular"),
+    local(".SFNSDisplay"),
+    url("/fonts/SF-Pro-Display-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src:
+    local("SF Pro Display Medium"),
+    local("SFProDisplay-Medium"),
+    local(".SFNSDisplay-Medium"),
+    url("/fonts/SF-Pro-Display-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: local("SF Pro Display Bold"), url("/fonts/SF-Pro-Display-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================================
+   Metric-matched fallbacks
+   ------------------------------------------------------------
+   Until licensed Canela files exist, these make Fraunces occupy
+   very nearly the same space Canela does, so line breaks, baseline
+   positions and block heights match the design even though the
+   letterforms differ. Numbers measured directly off the Canela
+   files — Fraunces is ~8% wider and has a much taller ascent
+   (0.978 vs 0.775), which is what throws the spacing.
+
+   These sit AFTER "Canela" in the stack, so a licensed webfont —
+   or a local install — always wins and these never apply.
+   ============================================================ */
+
+@font-face {
+  font-family: "Canela Fallback";
+  src: local("Fraunces"), local("Fraunces 9pt"), local("Georgia");
+  size-adjust: 91.8%;
+  ascent-override: 78.3%;
+  descent-override: 22.7%;
+  line-gap-override: 0%;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Canela Text Fallback";
+  src: local("Fraunces"), local("Fraunces 9pt"), local("Georgia");
+  size-adjust: 97.3%;
+  ascent-override: 74.2%;
+  descent-override: 21.1%;
+  line-gap-override: 0%;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Amsterdam";
+  src: url("/fonts/Amsterdam-Handwriting.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* EurostileExtendedBlack.woff2 is not in public/fonts either — same dead-404
+   situation as SF Pro Medium. local() only until the file is supplied. */
+@font-face {
+  font-family: "Eurostile Extended";
+  src:
+    local("Eurostile Extended Black"),
+    local("EurostileExtendedBlack"),
+    local("Eurostile Extended"),
+    local("Eurostile");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MicroGBE";
+  src: url("/fonts/MICROGBE.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---- Libre Caslon Display ---- */
+
+@font-face {
+  font-family: "Libre Caslon Display";
+  src: local("Libre Caslon Display"), local("LibreCaslonDisplay-Regular"), local("LibreCaslonDisplay"), url("/fonts/LibreCaslonDisplay-Regular.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---- Big Caslon ---- */
+
+@font-face {
+  font-family: "Big Caslon";
+  src: local("Big Caslon"), local("BigCaslon"), local("Big Caslon FB"), local("BigCaslonFB"), url("/fonts/BigCaslon.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Big Caslon FB";
+  src: local("Big Caslon FB"), local("BigCaslonFB"), local("Big Caslon"), local("BigCaslon"), url("/fonts/BigCaslon.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "BigCaslonFB";
+  src: local("BigCaslonFB"), local("Big Caslon FB"), local("Big Caslon"), local("BigCaslon"), url("/fonts/BigCaslon.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+/* ---- Minion Variable Concept ----
+   MinionVariableConcept-Roman is set in Ambassador Onboarding.ai and
+   Join waitlist.ai. It is an Adobe face with no redistributable webfont, so
+   this resolves from a local install (Creative Cloud) and otherwise falls
+   through to the --font-minionvariable stack declared in app/globals.css. */
+
+@font-face {
+  font-family: "Minion Variable Concept";
+  src:
+    local("Minion Variable Concept Roman"),
+    local("MinionVariableConcept-Roman"),
+    local("Minion Variable Concept"),
+    local("MinionVariableConcept"),
+    local("Minion Pro Regular"),
+    local("MinionPro-Regular");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---- Helvetica Neue Condensed Black ----
+   HelveticaNeue-CondensedBlack is set in Bubba Website.ai. Bundled with macOS
+   but not licensed for redistribution, so local() only. The fallback chain in
+   --bb-helvetica-condensed / --font-helvetica-condensed ends at Arial Narrow,
+   which is the closest condensed grotesque available cross-platform. */
+
+@font-face {
+  font-family: "Helvetica Neue Condensed Black";
+  src:
+    local("Helvetica Neue Condensed Black"),
+    local("HelveticaNeue-CondensedBlack"),
+    local("HelveticaNeueBlackCondensed"),
+    local("Helvetica Neue Condensed Bold"),
+    local("HelveticaNeue-CondensedBold");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---- Myriad Pro ----
+   MyriadPro-Regular appears in Bubba Website.ai, Ambassador Onboarding.ai and
+   Join waitlist.ai. It is Illustrator's default face, so some of those runs are
+   likely untitled/placeholder text rather than intentional styling — but it is
+   registered here so it is reachable from code either way.
+
+   Adobe face, bundled with Creative Cloud, no redistributable webfont, so this
+   is local() only. Falls through to the humanist-sans stack in --font-myriad
+   (app/globals.css); Calibri and Segoe UI are the closest widely-installed
+   matches for Myriad's proportions. */
+
+@font-face {
+  font-family: "Myriad Pro";
+  src:
+    local("Myriad Pro Regular"),
+    local("MyriadPro-Regular"),
+    local("Myriad Pro"),
+    local("MyriadPro"),
+    local("Myriad");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---- Recoleta ----
+   The face of the "24" mark (Asset 4.svg) and of "24 hours to chat".
+
+   Latinotype retail face, no redistributable webfont here, so this is local()
+   only for the same reason as Canela and Myriad above. Two notes before anyone
+   "fixes" this by dropping a file in /public/fonts:
+
+     1. The names below DO resolve on a machine carrying Latinotype's trial
+        (~/Library/Fonts/Recoleta-RegularDEMO.otf). CSS local() matching is
+        looser than the JS FontFace API: the API only answers to
+        "Recoleta-RegularDEMO", but local("Recoleta") reaches it from CSS. So
+        the tagline renders in true Recoleta on those machines and in the
+        Fraunces stand-in everywhere else — measured, not assumed.
+     2. The trial is watermarked on the fi and fl LIGATURES only — they paint a
+        black "DEMO latinotype" badge; the plain letters are untouched. The two
+        rules using --bb-recoleta therefore set font-variant-ligatures: none,
+        so a copy change cannot surface the badge. The trial file still must
+        not be committed to /public/fonts.
+
+   WHEN THE WEBFONT LICENCE LANDS: drop the .woff2 into /public/fonts and add
+       url("/fonts/Recoleta-Regular.woff2") format("woff2")
+   to the src below. Nothing else in the codebase changes — --bb-recoleta in
+   bubba.css already points here and falls through to Canela. */
+
+@font-face {
+  font-family: "Recoleta";
+  src:
+    local("Recoleta Regular"),
+    local("Recoleta-Regular"),
+    local("Recoleta");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

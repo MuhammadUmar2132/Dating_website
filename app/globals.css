@@ -1,0 +1,205 @@
+/* Caveat is no longer pulled from the Google CDN here — it is self-hosted by
+   next/font/google in lib/fonts.ts and exposed as --font-caveat. A CSS @import
+   of a third-party stylesheet blocks first paint on a cross-origin round trip,
+   which next/font avoids entirely. */
+@import "../styles/type-scale.css";
+@import "../styles/waitlist-fonts.css";
+@import "../styles/waitlist.css";
+@import "../styles/waitlist-coded.css";
+@import "../styles/waitlist-mobile.css";
+@import "../styles/bubba-fonts.css";
+@import "tailwindcss";
+
+@theme {
+  /* ══════════════════════════════════════════════════════════════════════
+     TYPEFACES FROM THE ILLUSTRATOR SOURCES (/ui/*.ai)
+     ──────────────────────────────────────────────────────────────────────
+     Every family that appears in Bubba Website.ai, Final Mobile website home
+     page.ai, Join waitlist.ai or Ambassador Onboarding.ai is declared here,
+     including ones nothing renders yet — the token is the stable handle to
+     write against, so future markup never needs a raw font-family string.
+
+     Each becomes a Tailwind utility automatically: --font-suisse → font-suisse.
+
+     @font-face registration for the self-hosted / local-only faces lives in
+     styles/bubba-fonts.css. The Google-served ones (Lato, Caveat, DM Serif
+     Display) are self-hosted by next/font/google in lib/fonts.ts.
+     ══════════════════════════════════════════════════════════════════════ */
+
+  --font-sans: var(--font-sans);
+  --font-lato: var(--font-sans);
+
+  /* Recoleta is the display face now; both tokens lead with it and keep the
+     Canela cuts behind as the fallback, so every existing var(--font-canela*)
+     call site follows without being rewritten. The names are historical. */
+  --font-canela:
+    "Recoleta", "Canela Text", "CanelaTextTri", "CanelaTextTri-Regular",
+    "Canela Text Trial", "Canela Text Trial Regular", "Canela", serif;
+  --font-canela-text: var(--font-canela);
+  --font-canela-display:
+    "Recoleta", "Canela", "Canela Trial", "CanelaTrial", "Canela Text",
+    var(--font-fraunces), Georgia, "Times New Roman", serif;
+
+  --font-sfpro:
+    "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+
+  /* Suisse Intl — used across all four .ai files (Regular/Medium/Semibold/
+     Bold) but had no token until now. */
+  --font-suisse:
+    "Suisse Intl", "Suisse Int'l", "SuisseIntl", "Suisse Int'l Trial",
+    var(--font-sans), -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+
+  --font-minion: "Minion Concept", "Minion Pro", "Minion", Georgia, serif;
+  /* Minion has no redistributable webfont, so it only resolves from a local
+     Creative Cloud install. Canela is the fallback because it is self-hosted in
+     public/fonts and uses LINING figures - the Caslons and Georgia default to
+     old-style figures, which render 1 as a serifed I and 0 as a small ring. */
+  --font-minionvariable:
+    "Minion Variable Concept", "MinionVariableConcept-Roman", "Minion Variable",
+    "MinionVariable", "Minion Concept", "Minion Pro", "Minion",
+    "Canela", "Canela Text", "Times New Roman", serif;
+
+  /* Myriad Pro — Illustrator's default face; present in three of the four
+     sources. Calibri/Segoe UI are the nearest common humanist sans. */
+  --font-myriad:
+    "Myriad Pro", "MyriadPro-Regular", Myriad, Calibri, "Segoe UI",
+    var(--font-sans), Helvetica, Arial, sans-serif;
+
+  /* Big Caslon — the countdown numerals. Libre Caslon Display is the
+     open-licence stand-in that is actually shipped in public/fonts. */
+  --font-bigcaslon:
+    "Big Caslon", "Big Caslon FB", "BigCaslonFB", "Libre Caslon Display",
+    "LibreCaslonDisplay", Georgia, "Times New Roman", serif;
+
+  /* Amsterdam Handwriting — the script accents in Bubba Website.ai. This one
+     IS shipped in public/fonts. */
+  --font-amsterdam:
+    "Amsterdam", "Amsterdam Handwriting", var(--font-caveat), "Segoe Script",
+    cursive;
+
+  /* Self-hosted by next/font/google (lib/fonts.ts). Both appear in the
+     Illustrator sources under /ui. Named distinctly from the next/font
+     variables (--font-caveat / --font-dm-serif) they wrap: a custom property
+     that references itself is invalid CSS and silently drops out. */
+  --font-script: var(--font-caveat), "Segoe Script", "Bradley Hand", cursive;
+  --font-dmserif: var(--font-dm-serif), Georgia, "Times New Roman", serif;
+
+  /* Helvetica Neue Condensed Black — Bubba Website.ai. No redistributable
+     file, so this resolves from a local install and otherwise degrades to the
+     nearest condensed grotesque available on the platform. */
+  --font-helvetica-condensed:
+    "Helvetica Neue Condensed Black", "HelveticaNeue-CondensedBlack",
+    "Helvetica Neue", "Arial Narrow", Helvetica, Arial, sans-serif;
+
+  /* BEA type scale → Tailwind text-* utilities (source: styles/type-scale.css) */
+  --text-display-2xl: var(--bea-text-display-2xl);
+  --text-display-xl: var(--bea-text-display-xl);
+  --text-display-lg: var(--bea-text-display-lg);
+  --text-display-md: var(--bea-text-display-md);
+  --text-display-sm: var(--bea-text-display-sm);
+  --text-heading-lg: var(--bea-text-heading-lg);
+  --text-heading-md: var(--bea-text-heading-md);
+  --text-body-xl: var(--bea-text-body-xl);
+  --text-body-md: var(--bea-text-body-md);
+  --text-body-sm: var(--bea-text-body-sm);
+  --text-caption-md: var(--bea-text-caption-md);
+  --text-caption-sm: var(--bea-text-caption-sm);
+}
+
+.font-canela {
+  font-family:
+    "Canela Text", "CanelaTextTri", "CanelaTextTri-Regular",
+    "Canela Text Trial", "Canela Text Trial Regular", "Canela", serif;
+}
+
+@layer base {
+  :root {
+    --bea-bg: #f7f5f2;
+    --bea-black: #000000;
+    --bea-nyc: #050505;
+    --bea-input: #d7d4ce;
+    --bea-card-light: #fffcfe;
+    --bea-pill-light: #fbf5f0;
+    --bea-launch-bg: #f6f3ef;
+  }
+}
+
+body {
+  background-color: var(--bea-bg);
+  color: var(--bea-black);
+  font-family: var(--font-sans), sans-serif;
+}
+
+@layer components {
+  .rewards-mobile {
+    @apply block lg:hidden w-full;
+  }
+
+  .rewards-desktop {
+    @apply hidden lg:block w-full max-w-5xl mx-auto py-8 px-2;
+  }
+
+  /* Card styles used across rewards UI */
+  .card {
+    background: #fdfcfb;
+    border: 1px solid #ede8e1;
+    border-radius: 16px;
+  }
+
+  .card--muted {
+    background: #f4f0ec;
+    border: 1px solid #e3ded6;
+    border-radius: 12px;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes adminSlideLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes adminSlideRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-left {
+  animation: adminSlideLeft 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-right {
+  animation: adminSlideRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes adminPop {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-pop {
+  animation: adminPop 0.16s ease-out forwards;
+}

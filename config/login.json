@@ -1,0 +1,102 @@
+{
+  "meta": {
+    "title": "Bea — Ambassador Login",
+    "description": "Log in to your Bea ambassador account"
+  },
+  "fonts": {
+    "sans": "Lato, -apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, sans-serif",
+    "serif": "Fraunces, Georgia, Times New Roman, serif"
+  },
+  "theme": {
+    "cssVariables": {
+      "--bg": "#f2f0eb",
+      "--white": "#ffffff",
+      "--black": "#1a1a1a",
+      "--text-primary": "#1a1a1a",
+      "--text-secondary": "#6b6b6b",
+      "--text-muted": "#9a9a9a",
+      "--border": "#d8d5cf",
+      "--input-bg": "#ffffff",
+      "--btn-bg": "#20452f",
+      "--btn-text": "#ffffff",
+      "--green": "#20452f",
+      "--highlight": "#fbcbcc"
+    }
+  },
+  "api": {
+    "login": "/api/auth/login",
+    "google": "/api/auth/social",
+    "apple": "/api/auth/social",
+    "useExternalBackend": false,
+    "externalBaseUrl": "",
+    "redirectOnSuccess": "/dashboard/ambassador"
+  },
+  "leftPanel": {
+    "eyebrow": "JOIN US THIS SUMMER & FALL",
+    "headline": "Ambassador Program",
+    "tagline": "by invite only."
+  },
+  "header": {
+    "backLabel": "Back to login",
+    "backHref": "/login"
+  },
+  "form": {
+    "eyebrow": "Ambassador Login",
+    "title": "Welcome back.",
+    "subtitle": "Log in to your ambassador account.",
+    "fields": [
+      {
+        "id": "email",
+        "label": "Email",
+        "type": "email",
+        "placeholder": "you@email.com",
+        "autoComplete": "email",
+        "required": true
+      },
+      {
+        "id": "password",
+        "label": "Password",
+        "type": "password",
+        "placeholder": "Enter your password",
+        "autoComplete": "current-password",
+        "required": true,
+        "showToggle": true
+      }
+    ],
+    "rememberMe": {
+      "label": "Remember me",
+      "defaultChecked": true
+    },
+    "forgotPassword": {
+      "label": "Forgot password?",
+      "href": "/forgot-password"
+    },
+    "submit": {
+      "label": "Log in",
+      "loadingLabel": "Logging in…"
+    },
+    "divider": "OR",
+    "social": [
+      {
+        "id": "google",
+        "label": "Continue with Google",
+        "provider": "google"
+      },
+      {
+        "id": "apple",
+        "label": "Continue with Apple",
+        "provider": "apple"
+      }
+    ],
+    "apply": {
+      "prompt": "New to the ambassador program?",
+      "linkLabel": "Apply now",
+      "href": "/onboarding"
+    }
+  },
+  "footer": {
+    "prefix": "Need help? Contact",
+    "email": "ambassadors@beadating.com",
+    "emailHref": "mailto:ambassadors@beadating.com"
+  }
+}

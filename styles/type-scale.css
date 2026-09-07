@@ -1,0 +1,385 @@
+/* ============================================================
+   BEA Type Scale — single source of truth for text sizing
+   ------------------------------------------------------------
+   Import this file before any feature stylesheet. Use tokens in
+   CSS (var(--bea-text-body-md)) or utility classes in markup.
+
+   Scope: sizes, line-heights, letter-spacing, button scale.
+   Out of scope: color, font-family (set per context / component).
+
+   Usage in CSS:
+     font-size: var(--bea-text-body-md);
+     line-height: var(--bea-leading-body);
+
+   Usage in HTML / JSX:
+     <h1 class="bea-type-display-2xl">…</h1>
+     <p class="bea-type-body-md">…</p>
+     <button class="bea-btn bea-btn--marketing">Join</button>
+
+   Aliases: legacy --bb-text-* tokens in bubba.css point here.
+   ============================================================ */
+
+:root {
+  /* ── Display (marketing headings) ── */
+  --bea-text-display-2xl: 5.125rem; /* 82px — hero max */
+  --bea-text-display-xl: 4.5rem; /* 72px — alt hero, large stats */
+  --bea-text-display-lg: 3.75rem; /* 60px — section titles */
+  --bea-text-display-md: 3rem; /* 48px — page titles */
+  --bea-text-display-sm: 2.25rem; /* 36px — step / card titles */
+  --bea-text-display-xs: 1.875rem; /* 30px — compact display */
+
+  /* Fluid display (mobile-first) */
+  --bea-text-display-2xl-fluid: clamp(3rem, 7vw, 5.125rem);
+  --bea-text-display-xl-fluid: clamp(2.75rem, 6vw, 4.5rem);
+  --bea-text-display-lg-fluid: clamp(2.25rem, 5vw, 3.75rem);
+  --bea-text-display-md-fluid: clamp(2rem, 4vw, 3rem);
+  --bea-text-display-sm-fluid: clamp(1.75rem, 3vw, 2.25rem);
+  --bea-text-display-xs-fluid: clamp(1.625rem, 2.5vw, 1.875rem);
+
+  /* ── Heading (subheads, intros) ── */
+  --bea-text-heading-xl: 1.75rem; /* 28px */
+  --bea-text-heading-lg: 1.5rem; /* 24px — primary subhead */
+  --bea-text-heading-md: 1.3125rem; /* 21px — secondary subhead */
+  --bea-text-heading-sm: 1.25rem; /* 20px */
+  --bea-text-heading-xs: 1.125rem; /* 18px — tertiary subhead */
+
+  --bea-text-heading-xl-fluid: clamp(1.375rem, 2.5vw, 1.75rem);
+  --bea-text-heading-lg-fluid: clamp(1.3125rem, 2vw, 1.5rem);
+  --bea-text-heading-md-fluid: clamp(1.125rem, 1.8vw, 1.3125rem);
+
+  /* ── Body ── */
+  --bea-text-body-xl: 1.125rem; /* 18px — body large */
+  --bea-text-body-md: 1rem; /* 16px — body medium (default) */
+  --bea-text-body-sm: 0.875rem; /* 14px — body small */
+  --bea-text-body-compact: 0.9375rem; /* 15px — compact UI copy */
+
+  /* ── Eyebrow / Overlines ── */
+  --bea-text-eyebrow: 0.6875rem; /* 11px mobile default (-1px from 12px) */
+  --bea-text-eyebrow-lg: var(--bea-text-heading-xs); /* 18px desktop default */
+  --bea-text-eyebrow-fluid: clamp(0.6875rem, 1.2vw + 0.45rem, 1.125rem); /* 11px -> 18px */
+
+  /* ── Caption / labels ── */
+  --bea-text-caption-md: 0.8125rem; /* 13px — meta, hints */
+  --bea-text-caption-sm: 0.75rem; /* 12px — captions, overlines */
+  --bea-text-label-micro: 0.6875rem; /* 11px — field caps, units */
+  --bea-text-label-nano: 0.625rem; /* 10px — dividers, chips */
+
+  /* ── Special (outside modular scale) ── */
+  --bea-text-stat-xl: 5.75rem; /* 92px — day numerals, rank */
+  --bea-text-stat-lg: 6.4375rem; /* 103px — mobile rank hero */
+
+  /* ── Line heights ── */
+  --bea-leading-none: 1;
+  --bea-leading-display: 1.08;
+  --bea-leading-display-tight: 1.02;
+  --bea-leading-heading: 1.45;
+  --bea-leading-heading-snug: 1.28;
+  --bea-leading-body: 1.55;
+  --bea-leading-body-snug: 1.35;
+  --bea-leading-ui: 1.52;
+  --bea-leading-caption: 1.4;
+
+  /* ── Letter spacing ── */
+  --bea-tracking-display: -0.04em;
+  --bea-tracking-display-snug: -0.03em;
+  --bea-tracking-display-tight: -0.01em;
+  --bea-tracking-heading: -0.01em;
+  --bea-tracking-body: 0;
+  --bea-tracking-overline: 0.16em;
+  --bea-tracking-overline-wide: 0.17em;
+  --bea-tracking-label: 0.12em;
+  --bea-tracking-label-tight: 0.06em;
+
+  /* ── Font weights (semantic) ── */
+  --bea-weight-regular: 400;
+  --bea-weight-medium: 500;
+  --bea-weight-semibold: 600;
+  --bea-weight-bold: 700;
+
+  /* UI default — SF Pro Display Medium per brand spec */
+  --bea-weight-ui: var(--bea-weight-medium);
+
+  /* ── Border Radius ── */
+  --bea-radius-sm: 0.5rem; /* 8px */
+  --bea-radius-md: 0.875rem; /* 14px */
+  --bea-radius-lg: 1rem; /* 16px */
+  --bea-radius-full: 9999px;
+
+  /* ── Button scale ── */
+  --bea-btn-xs-size: var(--bea-text-caption-sm);
+  --bea-btn-xs-height: 2rem; /* 32px */
+  --bea-btn-xs-padding-x: 0.875rem;
+
+  --bea-btn-sm-size: var(--bea-text-body-sm); /* 14px */
+  --bea-btn-sm-height: 2.25rem; /* 36px — industry standard mobile navbar / compact button */
+  --bea-btn-sm-padding-x: 0.875rem; /* 14px */
+
+  --bea-btn-md-size: var(--bea-text-body-md); /* 16px */
+  --bea-btn-md-height: 2.75rem; /* 44px */
+  --bea-btn-md-padding-x: 1.25rem; /* 20px */
+
+  --bea-btn-lg-size: var(--bea-text-body-md); /* 16px */
+  --bea-btn-lg-height: 3rem; /* 48px */
+  --bea-btn-lg-padding-x: 1.5rem; /* 24px */
+
+  --bea-btn-xl-size: var(--bea-text-body-xl); /* 18px */
+  --bea-btn-xl-height: 3.5rem; /* 56px */
+  --bea-btn-xl-padding-x: 2rem; /* 32px */
+
+  --bea-btn-marketing-size: var(--bea-text-body-md); /* 16px */
+  --bea-btn-marketing-height: 3rem; /* 48px */
+  --bea-btn-marketing-padding-x: 1.5rem; /* 24px */
+
+  --bea-btn-marketing-lg-size: var(--bea-text-body-xl); /* 18px */
+  --bea-btn-marketing-lg-height: 3.5rem; /* 56px */
+  --bea-btn-marketing-lg-padding-x: 2rem; /* 32px */
+
+  --bea-btn-radius: var(--bea-radius-full);
+  --bea-btn-marketing-radius: var(--bea-radius-full);
+
+  --bea-btn-weight: var(--bea-weight-medium);
+  --bea-btn-leading: 1.5;
+}
+
+/* ============================================================
+   Size utilities — font-size only (compose with your font/color)
+   ============================================================ */
+
+.bea-text-display-2xl { font-size: var(--bea-text-display-2xl); }
+.bea-text-display-xl { font-size: var(--bea-text-display-xl); }
+.bea-text-display-lg { font-size: var(--bea-text-display-lg); }
+.bea-text-display-md { font-size: var(--bea-text-display-md); }
+.bea-text-display-sm { font-size: var(--bea-text-display-sm); }
+.bea-text-display-xs { font-size: var(--bea-text-display-xs); }
+
+.bea-text-display-2xl-fluid { font-size: var(--bea-text-display-2xl-fluid); }
+.bea-text-display-xl-fluid { font-size: var(--bea-text-display-xl-fluid); }
+.bea-text-display-lg-fluid { font-size: var(--bea-text-display-lg-fluid); }
+.bea-text-display-md-fluid { font-size: var(--bea-text-display-md-fluid); }
+.bea-text-display-sm-fluid { font-size: var(--bea-text-display-sm-fluid); }
+.bea-text-display-xs-fluid { font-size: var(--bea-text-display-xs-fluid); }
+
+.bea-text-heading-xl { font-size: var(--bea-text-heading-xl); }
+.bea-text-heading-lg { font-size: var(--bea-text-heading-lg); }
+.bea-text-heading-md { font-size: var(--bea-text-heading-md); }
+.bea-text-heading-sm { font-size: var(--bea-text-heading-sm); }
+.bea-text-heading-xs { font-size: var(--bea-text-heading-xs); }
+
+.bea-text-heading-xl-fluid { font-size: var(--bea-text-heading-xl-fluid); }
+.bea-text-heading-lg-fluid { font-size: var(--bea-text-heading-lg-fluid); }
+.bea-text-heading-md-fluid { font-size: var(--bea-text-heading-md-fluid); }
+
+.bea-text-body-xl { font-size: var(--bea-text-body-xl); }
+.bea-text-body-md { font-size: var(--bea-text-body-md); }
+.bea-text-body-sm { font-size: var(--bea-text-body-sm); }
+.bea-text-body-compact { font-size: var(--bea-text-body-compact); }
+
+.bea-text-caption-md { font-size: var(--bea-text-caption-md); }
+.bea-text-caption-sm { font-size: var(--bea-text-caption-sm); }
+.bea-text-label-micro { font-size: var(--bea-text-label-micro); }
+.bea-text-label-nano { font-size: var(--bea-text-label-nano); }
+
+.bea-text-stat-xl { font-size: var(--bea-text-stat-xl); }
+.bea-text-stat-lg { font-size: var(--bea-text-stat-lg); }
+
+/* ============================================================
+   Composite type utilities — size + rhythm (no font-family/color)
+   ============================================================ */
+
+.bea-type-display-2xl {
+  font-size: var(--bea-text-display-2xl-fluid);
+  line-height: var(--bea-leading-display);
+  letter-spacing: var(--bea-tracking-display);
+}
+
+.bea-type-display-xl {
+  font-size: var(--bea-text-display-xl-fluid);
+  line-height: var(--bea-leading-display);
+  letter-spacing: var(--bea-tracking-display-snug);
+}
+
+.bea-type-display-lg {
+  font-size: var(--bea-text-display-lg-fluid);
+  line-height: var(--bea-leading-display);
+  letter-spacing: var(--bea-tracking-display-snug);
+}
+
+.bea-type-display-md {
+  font-size: var(--bea-text-display-md-fluid);
+  line-height: var(--bea-leading-display);
+  letter-spacing: var(--bea-tracking-display-snug);
+}
+
+.bea-type-display-sm {
+  font-size: var(--bea-text-display-sm-fluid);
+  line-height: var(--bea-leading-display);
+  letter-spacing: var(--bea-tracking-display-snug);
+}
+
+.bea-type-display-xs {
+  font-size: var(--bea-text-display-xs-fluid);
+  line-height: var(--bea-leading-heading-snug);
+  letter-spacing: var(--bea-tracking-display-snug);
+}
+
+.bea-type-heading-lg {
+  font-size: var(--bea-text-heading-lg);
+  line-height: var(--bea-leading-heading);
+  letter-spacing: var(--bea-tracking-heading);
+}
+
+.bea-type-heading-md {
+  font-size: var(--bea-text-heading-md);
+  line-height: var(--bea-leading-heading);
+  letter-spacing: var(--bea-tracking-body);
+}
+
+.bea-type-heading-sm {
+  font-size: var(--bea-text-heading-sm);
+  line-height: var(--bea-leading-heading);
+  letter-spacing: var(--bea-tracking-body);
+}
+
+.bea-type-body-xl {
+  font-size: var(--bea-text-body-xl);
+  line-height: var(--bea-leading-body);
+  letter-spacing: var(--bea-tracking-body);
+}
+
+.bea-type-body-md {
+  font-size: var(--bea-text-body-md);
+  line-height: var(--bea-leading-body);
+  letter-spacing: var(--bea-tracking-body);
+}
+
+.bea-type-body-sm {
+  font-size: var(--bea-text-body-sm);
+  line-height: var(--bea-leading-body-snug);
+  letter-spacing: var(--bea-tracking-body);
+}
+
+.bea-type-caption-md {
+  font-size: var(--bea-text-caption-md);
+  line-height: var(--bea-leading-caption);
+  letter-spacing: var(--bea-tracking-body);
+}
+
+.bea-type-caption-sm {
+  font-size: var(--bea-text-caption-sm);
+  line-height: var(--bea-leading-caption);
+  letter-spacing: var(--bea-tracking-body);
+}
+
+.bea-type-overline {
+  font-size: var(--bea-text-caption-sm);
+  line-height: var(--bea-leading-ui);
+  letter-spacing: var(--bea-tracking-overline);
+  text-transform: uppercase;
+}
+
+.bea-type-overline-wide {
+  font-size: var(--bea-text-caption-sm);
+  line-height: var(--bea-leading-ui);
+  letter-spacing: var(--bea-tracking-overline-wide);
+  text-transform: uppercase;
+}
+
+.bea-type-label-caps {
+  font-size: var(--bea-text-label-micro);
+  line-height: var(--bea-leading-caption);
+  letter-spacing: var(--bea-tracking-label);
+  text-transform: uppercase;
+}
+
+.bea-type-label-micro {
+  font-size: var(--bea-text-label-micro);
+  line-height: var(--bea-leading-caption);
+  letter-spacing: var(--bea-tracking-body);
+}
+
+/* ============================================================
+   Weight utilities
+   ============================================================ */
+
+.bea-weight-regular { font-weight: var(--bea-weight-regular); }
+.bea-weight-medium { font-weight: var(--bea-weight-medium); }
+.bea-weight-semibold { font-weight: var(--bea-weight-semibold); }
+.bea-weight-bold { font-weight: var(--bea-weight-bold); }
+.bea-weight-ui { font-weight: var(--bea-weight-ui); }
+
+/* ============================================================
+   Button scale — size + rhythm only; pair with your color variants
+   ============================================================ */
+
+.bea-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: var(--bea-btn-weight);
+  line-height: var(--bea-btn-leading);
+  border: 1px solid transparent;
+  border-radius: var(--bea-radius-full);
+  cursor: pointer;
+  text-decoration: none;
+  box-sizing: border-box;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.bea-btn:active {
+  transform: translateY(1px);
+}
+
+.bea-btn--xs {
+  min-height: var(--bea-btn-xs-height);
+  padding: 0 var(--bea-btn-xs-padding-x);
+  font-size: var(--bea-btn-xs-size);
+}
+
+.bea-btn--sm {
+  min-height: var(--bea-btn-sm-height);
+  padding: 0 var(--bea-btn-sm-padding-x);
+  font-size: var(--bea-btn-sm-size);
+}
+
+.bea-btn--md {
+  min-height: var(--bea-btn-md-height);
+  padding: 0 var(--bea-btn-md-padding-x);
+  font-size: var(--bea-btn-md-size);
+}
+
+.bea-btn--lg {
+  min-height: var(--bea-btn-lg-height);
+  padding: 0 var(--bea-btn-lg-padding-x);
+  font-size: var(--bea-btn-lg-size);
+}
+
+.bea-btn--xl {
+  min-height: var(--bea-btn-xl-height);
+  padding: 0 var(--bea-btn-xl-padding-x);
+  font-size: var(--bea-btn-xl-size);
+}
+
+.bea-btn--marketing {
+  min-height: var(--bea-btn-marketing-height);
+  padding: 0 var(--bea-btn-marketing-padding-x);
+  font-size: var(--bea-btn-marketing-size);
+  width: 100%;
+}
+
+.bea-btn--marketing-lg {
+  min-height: var(--bea-btn-marketing-lg-height);
+  padding: 0 var(--bea-btn-marketing-lg-padding-x);
+  font-size: var(--bea-btn-marketing-lg-size);
+  width: 100%;
+}
+
+/* Block-level marketing buttons (full-width flows) */
+.bea-btn--block {
+  display: flex;
+  width: 100%;
+}

@@ -1,0 +1,3320 @@
+/* ============================================================
+   Waitlist join flow — mobile
+   ------------------------------------------------------------
+   Type, colour and size taken from Join_waitlist.ai. Artboards
+   are 562pt wide; point sizes are scaled by 390/562 = 0.694, so
+   a 36pt heading lands at 25px and 24pt body at 16.5px.
+
+   Namespaced `jn-` so nothing here collides with bubba.css or
+   the legacy waitlist.css.
+   ============================================================ */
+
+@import "./type-scale.css";
+
+.jn-page {
+  /* One control scale across every screen — fields and buttons share the
+     same height, width, and radius as the intro form. */
+  --jn-field-h: 48px;
+  --jn-btn-h: 52px;
+  --jn-control-w: 100%;
+  --jn-btn-w: var(--jn-control-w);
+  --jn-control-radius: 8px;
+
+  --jn-paper: #fcfbfb;
+  --jn-ink: #000000;
+  --jn-green: #043e25;
+  --jn-green-btn: #1f452f;
+  --jn-blue: #3185e8;
+  /* "your city" on the intro — its own token so the done screen's
+     bordered link keeps the original --jn-blue. */
+  --jn-intro-accent: #4a83e1;
+  --jn-eyebrow: #5B6C9B;
+  --jn-body: #676669;
+  --jn-slate: #303a46;
+  --jn-meta: #727272;
+  --jn-placeholder: #8d8d8d;
+  --jn-input-text: #7d7d7d;
+  /* Optical centring for field text. A single-line input centres its editor
+     on the em box, and SF Pro Display's baseline sits so the cap band lands
+     dead centre (measured: 0.0000em off) while the x-height band lands
+     0.1000em low at the 400 weight this field uses. Email addresses are all
+     lowercase, so the field reads a pixel or two low next to the centred
+     envelope icon.
+
+     Applied as padding-bottom: the editor is centred inside the content box,
+     so trimming the box from below lifts it by half the padding — hence 2 x
+     0.1000. In em, so it stays correct at 13px on a phone and 18px on the
+     desktop instead of being a magic pixel value tuned to one size.
+
+     Measured per weight: the 400 face has a 0.51em x-height and the 500 face
+     0.52em, so this value tracks the field's font-weight — revisit it if that
+     changes. */
+  --jn-input-optical: 0.2em;
+  /* Small optical indent for the labels that head a block. Shared so the
+     eyebrow and the city rail below it start on the same vertical line —
+     a fixed px rather than an em, because the two elements it aligns are set
+     at different sizes. */
+  --jn-label-indent: 3px;
+  --jn-line: #cdcdcd;
+  --jn-line-card: #e8e8e8;
+  --jn-sel-border: #345d74;
+  --jn-sel-soft: #accbcd;
+  --jn-optout-border: #759a77;
+  --jn-tick: #7190ba;
+  --jn-tint: #e7f1f7;
+  --jn-optout: #eeeeea;
+
+  --jn-serif: var(--bb-canela-text, "Canela Text", Georgia, serif);
+  --jn-display: var(--bb-canela, "Canela", Georgia, serif);
+  --jn-ui: -apple-system, "SF Pro Display", BlinkMacSystemFont, system-ui,
+    var(--font-sans), sans-serif;
+  --jn-label: "Suisse Intl", "SuisseIntl";
+
+  /* bubba.css (which owns these) isn't loaded on the waitlist pages, so
+     define them here too — otherwise font-family: var(--bb-canela-text)
+     is an invalid value and the type silently falls back. */
+  --bb-canela: "Recoleta", "Canela", "Canela Fallback", var(--font-fraunces), Georgia,
+    "Times New Roman", serif;
+  --bb-canela-text: "Recoleta", "Canela Text", "Canela Text Fallback",
+    var(--font-fraunces), Georgia, "Times New Roman", serif;
+
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--jn-paper);
+  color: var(--jn-ink);
+  font-family: var(--jn-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+.jn-page *,
+.jn-page *::before,
+.jn-page *::after {
+  box-sizing: border-box;
+}
+
+/* ---------- Top bar + dots ---------- */
+
+.jn-top {
+  padding: 31.56px 28.55px 0;
+}
+
+.jn-brand {
+  display: inline-flex;
+  line-height: 0;
+}
+
+.jn-brand img {
+  height: 30.21px;
+  width: auto;
+}
+
+.jn-dots {
+  list-style: none;
+  margin: 20px 0 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  width: 180px;
+}
+
+.jn-dot {
+  display: flex;
+  align-items: center;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.jn-dot:last-child {
+  flex: 0 0 auto;
+}
+
+.jn-dot-mark {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid #c9c9c9;
+  background: transparent;
+  flex: none;
+}
+
+.jn-dot--done .jn-dot-mark,
+.jn-dot--now .jn-dot-mark {
+  background: var(--jn-green);
+  border-color: var(--jn-green);
+}
+
+/* Hairline between nodes — gap so the rule never kisses the circle. */
+.jn-dot:not(:last-child)::after {
+  content: "";
+  flex: 1 1 auto;
+  min-width: 12px;
+  height: 1px;
+  background: #d0d0d0;
+  margin: 0 6px;
+}
+
+/* ---------- Decorative step artwork ---------- */
+
+/* Copy and actions columns — stacked on mobile, side-by-side on desktop. */
+.jn-col-copy,
+.jn-col-actions {
+  display: contents;
+}
+
+/* Sits under the wordmark with the content layered over it. Hidden on
+   mobile — at 390px it would sit directly behind the form fields. */
+.jn-step-art {
+  display: none;
+}
+
+.jn-main,
+.jn-actions,
+.jn-top {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- Step head ---------- */
+
+.jn-main {
+  flex: 0 1 auto;
+  padding: 43.92px 36.73px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.jn-eyebrow {
+  font-family: var(--jn-label);
+  font-size: var(--bea-text-body-xl);
+  /* Semibold, matching .jn-or-label ("OR SEARCH ANY CITY") which was already
+     600 — the two are the same kind of label and were set a weight apart.
+     Suisse Intl ships a real 600 face, so this is not a synthesised weight. */
+  font-weight: var(--bea-weight-semibold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--jn-eyebrow);
+  margin: 0;
+  /* Small optical indent so the label sits just inside the heading below it.
+     The city rail uses the same token, so the two line up. */
+  padding-inline-start: var(--jn-label-indent);
+}
+
+.jn-heading {
+  font-family: var(--jn-serif);
+  font-weight: var(--bea-weight-regular);
+  font-size: var(--bea-text-display-sm);
+  line-height: var(--bea-leading-heading-snug);
+  color: var(--jn-ink);
+  margin: 32.64px 0 0;
+}
+
+.jn-heading span {
+  display: block;
+}
+
+.jn-sub {
+  font-size: var(--bea-text-heading-lg);
+  line-height: var(--bea-leading-heading);
+  color: var(--jn-body);
+  margin: 33.87px 0 0;
+  font-family: var(--font-sfpro);
+  /* Regular, not --bea-weight-ui (500). SF Pro Display ships a real 400 face,
+     so this is not a synthesised weight. */
+  font-weight: var(--bea-weight-regular);
+}
+
+.jn-sub span {
+  display: block;
+}
+
+/* "(This helps with launch)" is set a step down, 21pt against 24pt. */
+.jn-sub--aside span+span {
+  font-size: var(--bea-text-heading-md);
+}
+
+.jn-body {
+  margin-top: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.jn-page--basics .jn-body {
+  margin-top: 46.24px;
+}
+
+/* ---------- Fields ---------- */
+
+.jn-input {
+  width: 100%;
+  height: var(--jn-field-h);
+  border: 1px solid var(--jn-line);
+  border-radius: var(--jn-control-radius);
+  background: #fff;
+  /* iOS Safari draws text inputs with its own native metrics unless the
+     native appearance is switched off, and in that mode it does not reliably
+     honour the author's vertical padding — which is exactly what the optical
+     nudge below depends on. Without this the field centres correctly in every
+     desktop engine and still reads low on an iPhone. */
+  -webkit-appearance: none;
+  appearance: none;
+  padding: 0 16px var(--jn-input-optical);
+  /* 16px rather than the design's 12.5px: anything under 16 makes iOS
+     Safari zoom the viewport on focus, which breaks the layout mid-flow. */
+  font-size: var(--bea-text-body-xl);
+  font-family: var(--font-sfpro);
+  font-weight: var(--bea-weight-regular);
+  color: var(--jn-input-text);
+  outline: 0;
+}
+
+/* type="search" makes WebKit draw its own clear button inside the field — a
+   small grey cross that ignores the type scale and sits at the wrong optical
+   weight next to the rest of the flow. The field's own affordances (the
+   chosen-row X on city and campus) replace it. Setting appearance on the
+   input itself does not reach these pseudo-elements. */
+.jn-input::-webkit-search-cancel-button,
+.jn-input::-webkit-search-decoration,
+.jn-input::-webkit-search-results-button,
+.jn-input::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
+/* Placeholders inherit the input's font in every current engine, but state
+   it outright so the field's text and its placeholder can never drift onto
+   two different faces. */
+.jn-input::placeholder {
+  color: var(--jn-placeholder);
+  font-size: var(--bea-text-body-xl);
+  font-family: var(--font-sfpro);
+  font-weight: var(--bea-weight-regular);
+}
+
+/* No focus treatment: the field keeps its resting --jn-line border when
+   focused. `.jn-input` already sets `outline: 0`, so there is deliberately
+   no visible focus indicator on these inputs. */
+
+.jn-input-wrap {
+  position: relative;
+}
+
+.jn-input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--jn-placeholder);
+  pointer-events: none;
+}
+
+.jn-input--icon {
+  padding-left: 46px;
+}
+
+.jn-field {
+  display: block;
+}
+
+/* The artboard draws these shorter (58pt vs 71pt), but a single field
+   height across the flow reads better than matching that one detail. */
+.jn-field .jn-input {
+  height: var(--jn-field-h);
+}
+
+.jn-field-label {
+  display: block;
+  font-size: var(--bea-text-body-xl);
+  color: var(--jn-placeholder);
+  margin-bottom: 13.49px;
+}
+
+.jn-hint,
+.jn-error {
+  font-size: var(--bea-text-caption-md);
+  margin: 0;
+  color: #b3452f;
+}
+
+.jn-empty {
+  font-size: 14.5px;
+  color: var(--jn-body);
+  margin: 0;
+}
+
+.jn-fail {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  padding: 16px 18px;
+  border: 1px solid #e4c9c2;
+  border-radius: 10px;
+  background: #fdf6f4;
+}
+
+.jn-fail p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #8a3a26;
+}
+
+.jn-retry {
+  border: 1px solid #8a3a26;
+  background: transparent;
+  color: #8a3a26;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 999px;
+  padding: 7px 16px;
+  cursor: pointer;
+}
+
+.jn-retry:hover {
+  background: #8a3a26;
+  color: #fff;
+}
+
+/* ---------- City rail ---------- */
+
+.jn-cities-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.jn-cities-nav {
+  display: none;
+}
+
+.jn-cities {
+  list-style: none;
+  margin: 0 -24px;
+  padding: 0 24px;
+  display: flex;
+  gap: 10.85px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scroll-padding-left: 24px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.jn-cities::-webkit-scrollbar {
+  display: none;
+}
+
+.jn-city {
+    width: 147.71px;
+  height: 240.46px;
+  flex: none;
+  scroll-snap-align: start;
+  border: 1px solid var(--jn-line-card);
+  border-radius: 14px;
+  background: #fff;
+  padding: 0 0 10px;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+}
+
+.jn-city--ghost {
+  height: 167px;
+  border-color: transparent;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    #eeebe8 20%,
+    #f7f5f3 40%,
+    #eeebe8 60%
+  );
+  background-size: 200% 100%;
+  animation: jn-shimmer 1.35s ease-in-out infinite;
+}
+
+.jn-city-art {
+  display: block;
+  height: 122.17px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.jn-city-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  display: block;
+}
+
+.jn-city-name {
+  display: block;
+  font-size: 18px;
+  font-weight: 500;
+  color: #3a3a3a;
+  text-align: center;
+  margin-top: 9px;
+  font-family: var(--font-sfpro);
+}
+
+.jn-city--on {
+  border-color: var(--jn-sel-border);
+  box-shadow: 0 0 0 1px var(--jn-sel-border);
+}
+
+.jn-or-label {
+  font-family: var(--jn-label);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--jn-eyebrow);
+  margin: 91.47px 0 19.48px;
+}
+
+.jn-rail-label {
+  font-family: var(--jn-label);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--jn-green);
+  margin: 0 0 14px;
+  padding-inline-start: var(--jn-label-indent);
+}
+
+.jn-city-hint {
+  margin: 16px 0 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--jn-body);
+}
+
+.jn-city-hint strong {
+  font-weight: 600;
+  color: var(--jn-ink);
+}
+
+.jn-none {
+  border: 0;
+  background: transparent;
+  padding: 8px 0;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--jn-ink);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+}
+
+/* ---------- Campus ---------- */
+
+.jn-results {
+  list-style: none;
+  margin: -6px 0 0;
+  padding: 0;
+  border: 1px solid var(--jn-line);
+  border-radius: var(--jn-control-radius);
+  overflow: hidden;
+}
+
+/* ---------- Floating results ----------
+   The wrapper is the positioning context, and it keeps the height of the
+   field alone — so the matches hang over the content beneath instead of
+   pushing it down, and nothing below moves as you type.
+
+   z-index 5 clears .jn-actions, which sits at 2 on phones. Both are children
+   of .jn-main's stacking context, so the values compare directly. */
+.jn-search {
+  position: relative;
+  z-index: 5;
+}
+
+.jn-search .jn-results {
+  position: absolute;
+  top: calc(100% - 6px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  background: #fff;
+  /* Reads as a layer above the page rather than another block on it. */
+  box-shadow: 0 12px 28px rgba(22, 24, 26, 0.12);
+  max-height: 264px;
+  /* hidden on x keeps the rounded corners clipping the rows. */
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+}
+
+/* Opens upward when the field is too close to the bottom of the viewport to
+   show the list below it — on the city step the field sits just above the
+   actions, so downward would run off-screen. Toggled from JoinCity, which is
+   the only place that can measure the space available.
+
+   Must follow the rule above: same specificity, so source order decides. With
+   it first, `top` was never reset and the box stretched between a top and a
+   bottom that crossed, collapsing it to a couple of pixels. */
+.jn-search--up .jn-results {
+  top: auto;
+  bottom: calc(100% - 6px);
+}
+
+.jn-results button {
+  width: 100%;
+  text-align: left;
+  background: #fff;
+  border: 0;
+  border-bottom: 1px solid var(--jn-line);
+  padding: 13px 16px;
+  cursor: pointer;
+  font-family: inherit;
+  display: block;
+}
+
+.jn-results li:last-child button {
+  border-bottom: 0;
+}
+
+.jn-result-name {
+  display: block;
+  font-size: 16.65px;
+  color: var(--jn-ink);
+}
+
+.jn-result-meta {
+  display: block;
+  font-size: 12.5px;
+  color: var(--jn-meta);
+  margin-top: 2px;
+}
+
+.jn-results-note {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: var(--jn-meta);
+  background: #fff;
+}
+
+/* ============================================================
+   City search — react-select in `unstyled` mode.
+
+   `unstyled` strips the library's emotion styles so the control can
+   match .jn-input exactly; everything below is what replaces them.
+   Class names come from classNamePrefix="jn-select".
+   ============================================================ */
+
+.jn-select {
+  position: relative;
+  width: 100%;
+  font-family: var(--font-sfpro);
+}
+
+.jn-select .jn-select__control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--jn-field-h);
+  padding: 0 10px 0 16px;
+  border: 1px solid var(--jn-line);
+  border-radius: var(--jn-control-radius);
+  background: #fff;
+  /* Same size as .jn-input, so the Age field matches the First name field
+     beside it. Set on the control so the placeholder, the typed query and the
+     chosen value all share it — they stack in the same grid cell, and a size
+     difference between them makes the field jump on the first keystroke. */
+  font-size: var(--bea-text-body-xl);
+  color: var(--jn-ink);
+  cursor: text;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+/* No focus treatment, matching .jn-input on the intro: the control keeps its
+   resting --jn-line border when focused. */
+
+.jn-select .jn-select__control--is-disabled {
+  background: var(--jn-paper);
+  cursor: not-allowed;
+}
+
+/* The placeholder, the selected value and the text input all occupy the
+   same cell — `unstyled` removes the absolute positioning that normally
+   stacks them. */
+.jn-select .jn-select__value-container {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.jn-select .jn-select__placeholder,
+.jn-select .jn-select__single-value,
+.jn-select .jn-select__input-container {
+  grid-area: 1 / 1 / 2 / 2;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jn-select .jn-select__placeholder {
+  color: var(--jn-placeholder);
+}
+
+.jn-select .jn-select__single-value {
+  color: var(--jn-body);
+}
+
+/* Same ink as the chosen value, so the field does not change colour between
+   what you type and what you end up with. */
+.jn-select .jn-select__input-container {
+  display: inline-grid;
+  color: var(--jn-body);
+}
+
+/* A form control does not inherit colour from its ancestors on its own, so
+   the container's colour stops at the wrapper without this. */
+.jn-select .jn-select__input-container input {
+  color: inherit;
+}
+
+.jn-select .jn-select__indicators {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 2px;
+}
+
+.jn-select .jn-select__indicator-separator {
+  display: none;
+}
+
+.jn-select .jn-select__clear-indicator,
+.jn-select .jn-select__dropdown-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  color: var(--jn-meta);
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.jn-select .jn-select__clear-indicator:hover,
+.jn-select .jn-select__dropdown-indicator:hover {
+  color: var(--jn-ink);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.jn-select .jn-select__dropdown-indicator svg,
+.jn-select .jn-select__clear-indicator svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Geometry (top/bottom and the list's max-height) is left to react-select,
+   which is the only thing that knows how much room is under the field. It
+   emits those through the `styles` prop as an emotion class, and an emotion
+   class is a single class selector — anything declared here would outrank it
+   and pin the menu back to a fixed position and height. This rule keeps the
+   chrome only. */
+.jn-select .jn-select__menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 6;
+  background: #fff;
+  border: 1px solid var(--jn-line);
+  border-radius: var(--jn-control-radius);
+  box-shadow: 0 12px 28px rgba(22, 24, 26, 0.12);
+  overflow: hidden;
+}
+
+.jn-select .jn-select__menu-list {
+  overflow-y: auto;
+  padding: 4px;
+  overscroll-behavior: contain;
+}
+
+.jn-select .jn-select__option {
+  padding: 9px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.jn-select .jn-select__option--is-focused {
+  background: var(--jn-tint);
+}
+
+.jn-select .jn-select__option--is-selected {
+  background: var(--jn-tint);
+  box-shadow: inset 0 0 0 1px var(--jn-sel-border);
+}
+
+.jn-select .jn-select-option-name {
+  display: block;
+  font-size: 15px;
+  color: var(--jn-ink);
+}
+
+.jn-select .jn-select-option-meta {
+  display: block;
+  font-size: 12.5px;
+  color: var(--jn-meta);
+  margin-top: 2px;
+}
+
+.jn-select .jn-select__menu-notice {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: var(--jn-meta);
+  text-align: left;
+}
+
+/* Soft skeleton rows while a city/school search is in flight. */
+.jn-results-skel {
+  height: 52px;
+  margin: 0;
+  border-bottom: 1px solid var(--jn-line);
+  background: linear-gradient(
+    100deg,
+    #f3f1ef 20%,
+    #faf9f8 40%,
+    #f3f1ef 60%
+  );
+  background-size: 200% 100%;
+  animation: jn-shimmer 1.35s ease-in-out infinite;
+}
+
+.jn-results li:last-child.jn-results-skel {
+  border-bottom: 0;
+}
+
+/* Soft dim while an existing result list is refreshing. */
+.jn-results--busy {
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+
+.jn-chosen {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 66px;
+  background: var(--jn-tint);
+  border: 1px solid var(--jn-sel-border);
+  border-radius: var(--jn-control-radius);
+  padding: 12px 14px 12px 16px;
+  margin-top: 22.73px;
+}
+
+.jn-chosen-name {
+  display: block;
+  font-size: 16.65px;
+  color: var(--jn-ink);
+}
+
+.jn-chosen-meta {
+  display: block;
+  font-size: 12.5px;
+  color: var(--jn-meta);
+  margin-top: 2px;
+}
+
+.jn-chosen button {
+  border: 0;
+  background: transparent;
+  color: var(--jn-slate);
+  cursor: pointer;
+  line-height: 0;
+  padding: 4px;
+}
+
+.jn-or {
+  display: flex;
+  align-items: center;
+  gap: 42.02px;
+  margin: 48.78px 0 50.62px 0;
+}
+
+.jn-or::before,
+.jn-or::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--jn-line);
+}
+
+.jn-or span {
+  font-family: var(--jn-label);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--jn-eyebrow);
+}
+
+/* Default state reads as a plain secondary action — transparent/white
+   fill with a neutral border and dark text — so it's clearly distinct
+   from the filled, brand-tinted "selected" state below. */
+.jn-optout {
+  width: 100%;
+  /* A single-line choice, not a card — it tracks the same control height as
+     the search field above it (--jn-field-h is 48px, 59px from 1024px up) and
+     only grows if the label ever wraps. */
+  min-height: var(--jn-field-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #EEEEEA;
+  border: 1px solid #7D997A;
+  border-radius: var(--jn-control-radius);
+  padding: 12px 16px;
+  font-family: var(--font-sfpro);
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--jn-ink);
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.jn-optout:hover {
+  border-color: var(--jn-optout-border);
+}
+
+.jn-optout--on {
+  background: #E9F1F7;
+  border-color: #3E5C72;
+}
+
+/* ---------- Ambassadors ---------- */
+
+.jn-amb {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 13px;
+}
+
+.jn-amb-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-height: 66px;
+  background: #fff;
+  border: 1px solid var(--jn-line);
+  border-radius: 10px;
+  padding: 12px 14px 12px 17px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+
+.jn-amb-row--ghost {
+  height: 66px;
+  border-color: transparent;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    #eeebe8 20%,
+    #f7f5f3 40%,
+    #eeebe8 60%
+  );
+  background-size: 200% 100%;
+  animation: jn-shimmer 1.35s ease-in-out infinite;
+}
+
+.jn-amb-row--ghost:nth-child(2),
+.jn-city--ghost:nth-child(2),
+.jn-results-skel:nth-child(2) {
+  animation-delay: 0.12s;
+}
+
+.jn-amb-row--ghost:nth-child(3),
+.jn-city--ghost:nth-child(3),
+.jn-results-skel:nth-child(3) {
+  animation-delay: 0.24s;
+}
+
+.jn-city--ghost:nth-child(4) {
+  animation-delay: 0.36s;
+}
+
+.jn-amb-row--on {
+  background: var(--jn-tint);
+  border-color: var(--jn-sel-border);
+}
+
+.jn-amb-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--jn-tint);
+  border: 1px solid var(--jn-sel-soft);
+  color: var(--jn-eyebrow);
+  font-family: var(--jn-serif);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--jn-eyebrow);
+  display: grid;
+  place-items: center;
+  flex: none;
+  /* place-items centres the LINE BOX, not the letterforms. Canela Text's
+     ascent and descent are asymmetric (161 / 45 at 200px), so the cap band of
+     an all-caps monogram lands 0.075em above the box's centre and the
+     initials read high in the circle.
+
+     padding-top trims the content box from above, which moves the centred
+     item down by half the padding — hence 2 x 0.075. In em so it holds at
+     both the 40px badge and the 32px one on phones. */
+  padding-top: 0.15em;
+}
+
+.jn-amb-id {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.jn-amb-name {
+  display: block;
+  font-size: 16.65px;
+  color: var(--jn-ink);
+}
+
+.jn-amb-school {
+  display: block;
+  font-size: 12.5px;
+  color: var(--jn-meta);
+  margin-top: 2px;
+}
+
+/* Shown when the campus has no ambassadors on the public roster yet. */
+.jn-amb-empty {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--jn-meta);
+  margin: 4px 0 0;
+}
+
+.jn-amb-tick {
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  background: var(--jn-tick);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+/* ---------- Step actions (skip + CTA) ---------- */
+
+.jn-actions {
+  position: static;
+  background: var(--jn-paper);
+  margin-top: 32px;
+  /* Horizontal inset comes from .jn-main alone — .jn-body (the inputs)
+     gets no padding of its own, so .jn-actions must match that or the
+     button renders narrower than the fields above it. */
+  padding: 20px 0 calc(24px + env(safe-area-inset-bottom));
+  display: grid;
+  gap: 36.65px;
+  justify-items: center;
+}
+
+.jn-page--ambassador .jn-actions {
+  gap: 20.08px;
+}
+.jn-page--email .jn-body{
+    margin-top: 45.78px;
+}
+.jn-skip {
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--jn-green);
+  cursor: pointer;
+  text-decoration: none;
+  text-underline-offset: 5px;
+}
+
+.jn-skip--plain {
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--jn-ink);
+}
+
+.jn-page--ambassador .jn-skip {
+  font-size: 18px;
+  font-weight: 400;
+  color: #000;
+  text-decoration: underline;
+  text-underline-offset: 5.9px;
+}
+
+.jn-cta {
+  width: var(--jn-btn-w);
+  min-height: var(--bea-btn-marketing-height);
+  height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--jn-green-btn, #1f452f);
+  color: #fff;
+  border: 0;
+  border-radius: var(--jn-control-radius);
+  padding: 0 var(--bea-btn-marketing-padding-x);
+  font-family: var(--font-sfpro, -apple-system, sans-serif);
+  /* A step up from --bea-btn-marketing-size (16px). Overridden here rather
+     than on the token, which bubba.css uses for the marketing buttons. The
+     arrow is sized in em off this, so it follows on its own. */
+  font-size: var(--bea-text-body-xl); /* 18px */
+  font-weight: var(--bea-btn-weight);
+  line-height: var(--bea-btn-leading);
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.jn-cta:hover:not(:disabled) {
+  opacity: 0.92;
+}
+
+/* The arrow ships with width="22" height="18" attributes, so it drew at a
+   flat 18px no matter what size the label was — 138% of the text's ink height
+   at the 16px button, 129% at the 18px one. Sized in em against the cap
+   height instead (measured: SF Pro Display caps are 0.705em, and the whole
+   "Join the waitlist" string inks 0.730em), so the arrow matches the
+   letterforms and tracks the label at every breakpoint. width: auto lets the
+   22:18 viewBox keep the aspect. */
+.jn-cta svg {
+  position: absolute;
+  right: 33.71px;
+  height: 0.705em;
+  width: auto;
+}
+
+/* The reference screens always render Continue solid dark green — even
+   with no selection or empty required fields — so the disabled state
+   stays functionally non-interactive but is never visually dimmed. */
+.jn-cta:disabled {
+  cursor: not-allowed;
+}
+
+.jn-cta--busy:disabled {
+  cursor: wait;
+}
+
+.jn-cta-spin {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: jn-spin 0.7s linear infinite;
+  flex: none;
+}
+
+/* ---------- Intro screen ---------- */
+
+.jn-page--intro,
+.jn-page--done {
+  text-align: center;
+}
+
+.jn-page--done {
+  background: #fff;
+}
+
+.jn-top--intro {
+  display: grid;
+  justify-items: center;
+  padding-top: 26px;
+  position: relative;
+}
+
+/* Progress dots sit under the centered wordmark on mobile. */
+.jn-top--intro .jn-dots {
+  width: 180px;
+  max-width: 180px;
+}
+
+.jn-main--intro {
+  flex: 1 1 auto;
+  padding: 50.51px 24px 40px;
+  align-items: center;
+}
+
+.jn-intro-title {
+  font-family: var(--bb-canela, "Canela", Georgia, serif);
+  font-weight: var(--bea-weight-regular);
+  font-size: var(--bea-text-display-md-fluid);
+  line-height: var(--bea-leading-heading-snug);
+  letter-spacing: var(--bea-tracking-heading);
+  color: var(--jn-green);
+  margin: 0;
+}
+
+.jn-intro-accent {
+  color: var(--jn-intro-accent);
+}
+
+
+.jn-intro-sub {
+  font-family: var(--font-sfpro, -apple-system, sans-serif);
+  font-size: var(--bea-text-heading-lg-fluid);
+  line-height: var(--bea-leading-body);
+  color: var(--jn-body);
+  margin: 20px 0 0;
+  font-weight: var(--bea-weight-regular);
+}
+
+.jn-intro-art {
+  width: 100%;
+  max-width: 353px;
+  margin: 27.01px auto 11.5px;
+}
+
+.jn-intro-art img {
+  width: 100%;
+  height: auto;
+  display: block;
+  padding-left: 8px;
+}
+
+.jn-intro-form .jn-input::placeholder {
+  color: #c4c4c4;
+}
+
+.jn-intro-form .jn-field-label {
+  font-weight: var(--bea-weight-medium);
+}
+
+.jn-intro-copy {
+  display: contents;
+}
+
+@media (max-width: 1023px) {
+  /* ---- Intro: centered wordmark, copy → art → form ---- */
+
+  /* The form grid has no gap below 1024px, so the CTA carries its own
+     offset from the field. Scoped to 1023 rather than 767 — at tablet
+     widths the button was sitting flush against the input. */
+  .jn-intro-form .jn-cta {
+    margin-top: 28px;
+  }
+
+  .jn-page--intro .jn-main--intro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .jn-intro-title {
+    order: 1;
+  }
+
+  .jn-intro-sub {
+    order: 2;
+  }
+
+  .jn-intro-art {
+    order: 3;
+  }
+
+  .jn-intro-form {
+    order: 4;
+  }
+
+  .jn-promise {
+    order: 5;
+  }
+
+  /* The artboard is 562 x 1040 - roughly 1:1.85 - while phones are
+     proportionally taller than that, and the composition is scaled off the
+     viewport *width*. So once everything is laid out there is a leftover band
+     under the promise line that reads as dead space at the end of the page.
+
+     Hand that leftover to the four vertical gaps in the same ratio the
+     artboard uses between them (20 : 19 : 3 : 18), so the column stretches on
+     its own rhythm and finishes at the bottom of the screen instead of
+     pooling all the slack below the last line. Growing an item's box adds the
+     space underneath its content, which is exactly the gap that follows it.
+     On a viewport that matches the artboard ratio there is no leftover and
+     the spacing stays pixel-identical to the design.
+
+     Phones only: the ratio comes from the 390px artboard, and above 767px
+     the viewport is wide enough that handing it to the gaps just pulls the
+     column apart into dead bands. Tablets get their own rhythm further down. */
+  @media (max-width: 767px) {
+    .jn-intro-title {
+      flex-grow: 20;
+    }
+
+    .jn-intro-sub {
+      flex-grow: 19;
+    }
+
+    .jn-intro-art {
+      flex-grow: 3;
+    }
+
+    .jn-intro-form {
+      flex-grow: 18;
+      /* The form is a grid: without this its auto rows stretch along with the
+         box and pull the input and CTA out of shape. */
+      align-content: start;
+    }
+
+    /* Nothing after the promise line - the trailing space stays the artboard's
+       own bottom padding on .jn-main--intro. */
+    .jn-promise {
+      flex-grow: 0;
+    }
+  }
+
+  /* ---- Collecting steps: left wordmark, CTA pinned to bottom ---- */
+
+  .jn-page:not(.jn-page--intro):not(.jn-page--done) .jn-main {
+    flex: 1 1 auto;
+    padding-bottom: 0;
+    min-height: 0;
+  }
+
+  .jn-page:not(.jn-page--intro):not(.jn-page--done) .jn-actions {
+    z-index: 2;
+    margin-top: auto;
+    padding-top: 32.44px;
+  }
+
+  /* ---- Done: single centered column ---- */
+
+  .jn-page--done .jn-main--done {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.jn-intro-form {
+  width: 100%;
+  display: grid;
+  gap: 0px;
+  text-align: left;
+}
+
+.jn-promise {
+  display: inline-flex;
+  align-items: center;
+  gap: 16.92px;
+  font-size: 18px;
+  color: #878787;
+  margin: 29.01px 0 0;
+}
+
+.jn-promise svg {
+  color: var(--jn-eyebrow);
+}
+
+/* ============================================================
+   Intro screen on phones.
+
+   Every value below is expressed against the 390px-wide artboard: `--u` is one
+   artboard pixel scaled to the real viewport, so `calc(34 * var(--u))` is 34px
+   at 390px, 28px at 320px and 37px at 430px. Fixed pixel values only matched
+   one handset width and drifted on every other; this keeps the proportions
+   identical on all of them.
+
+   The two deliberate exceptions are noted where they appear.
+   ============================================================ */
+@media (max-width: 767px) {
+  /* --u is one 390px-artboard pixel scaled to the real viewport. Defined on
+     .jn-page rather than .jn-page--intro because the wordmark rule below is
+     shared by every screen in the flow; --pad stays intro-only. */
+  .jn-page {
+    --u: calc(100vw / 390);
+    /* Rendered height of the wordmark. Named because the dot rail below is
+       positioned off it. */
+    --jn-mark-h: calc(18 * var(--u));
+  }
+
+  .jn-page--intro {
+    --pad: calc(24 * var(--u));
+  }
+
+  .jn-main--intro {
+    padding: calc(27 * var(--u)) var(--pad) calc(40 * var(--u));
+  }
+
+  .jn-intro-title {
+    font-size: calc(34 * var(--u));
+    line-height: 1.3;
+  }
+
+  /* The artboard's sub is a lighter, cooler grey than --jn-body (#676669). */
+  .jn-intro-sub {
+    font-size: calc(16 * var(--u));
+    line-height: 1.65;
+    color: #7d7d7d;
+  }
+
+  /* The illustration runs off the right edge of the screen on the artboard: its
+     left edge lines up with the copy, its right edge bleeds past the container
+     padding. Centring it left a gutter on both sides instead. */
+  .jn-intro-art {
+    align-self: flex-end;
+    width: calc(100% + var(--pad));
+    max-width: none;
+    margin: calc(19 * var(--u)) calc(-1 * var(--pad)) calc(3 * var(--u)) 0;
+  }
+
+  /* Fine print above the field, the same size as the promise line below the
+     button rather than the 15px body size. */
+  .jn-intro-form .jn-field-label {
+    font-size: calc(12 * var(--u));
+  }
+
+  .jn-intro-form .jn-cta {
+    margin-top: calc(28 * var(--u));
+    height: calc(58 * var(--u));
+    /* The shared 48px min-height would floor the scaled height below 390px. */
+    min-height: 0;
+    font-size: calc(18 * var(--u));
+  }
+
+  /* The editor now tracks the placeholder's scaled size so the field reads at
+     one size whether it is empty or filled — previously the typed value came
+     in at 16px against a 13px placeholder and visibly jumped on first
+     keystroke.
+
+     The trade-off this accepts: iOS Safari zooms the viewport when a focused
+     input is under 16px, and at 390px this computes to ~13px. That zoom is
+     the reason the value was pinned at 16 before. */
+  .jn-intro-form .jn-input {
+    display: block;
+    font-size: calc(13 * var(--u));
+    height: calc(44 * var(--u));
+    line-height: normal;
+  }
+
+  .jn-intro-form .jn-input::placeholder {
+    font-size: calc(13 * var(--u));
+  }
+
+  /* The envelope carries width/height attributes, so both need overriding. */
+  .jn-intro-form .jn-input-icon {
+    left: calc(14 * var(--u));
+    width: calc(17 * var(--u));
+    height: calc(13 * var(--u));
+  }
+
+  .jn-intro-form .jn-input--icon {
+    padding-left: calc(40 * var(--u));
+    padding-right: calc(16 * var(--u));
+  }
+
+  /* Fine print with a small heart. The svg carries width/height attributes, so
+     CSS has to override both or it renders at its authored 23x20. */
+  .jn-promise {
+    font-size: calc(12 * var(--u));
+    font-weight: 400;
+    gap: calc(8 * var(--u));
+    margin-top: calc(18 * var(--u));
+  }
+
+  .jn-promise svg {
+    flex: 0 0 auto;
+    width: calc(15 * var(--u));
+    height: calc(13 * var(--u));
+  }
+
+  /* One wordmark treatment across the flow — the intro's scaled cut, so the
+     mark does not change size between the intro and the steps. The step
+     screens' own fixed 18px rule further down was removed in favour of this. */
+  .jn-brand img {
+    height: var(--jn-mark-h);
+  }
+}
+
+/* ============================================================
+   Mobile step screens — scaled to the mobile artboard.
+
+   The step chrome was built at desktop sizes and never scaled down
+   for phones: a 30px wordmark, an 18px eyebrow, a 36px heading that
+   wrapped "Where do you want" onto three lines, 24px body copy and
+   148x240 city cards. That ran the page to 1114px on a 390px phone.
+   ============================================================ */
+@media (max-width: 767px) {
+  .jn-top {
+    padding: 21px 28px 0;
+  }
+
+  /* The rail is centred on the viewport, and its first node sits directly
+     under the "u" of the wordmark — the two are the same statement, since
+     equal insets on a symmetrically padded header centre the row.
+
+     Where 1.1425 comes from: wordmark-black.png is 1656x456 (3.6316:1) and
+     its five glyphs were measured off the pixel columns — the "u" inks from
+     x361-681, centring at 31.46% of the image width. 0.3146 x 3.6316 = 1.1425
+     wordmark-heights from the mark's left edge. Subtracting half a 16px node
+     turns that centre into the row's inset.
+
+     This is tied to --jn-mark-h and to .jn-top's symmetric 28px padding; if
+     either moves, the alignment moves with it. */
+  .jn-dots {
+    --jn-mark-u-centre: calc(1.1425 * var(--jn-mark-h));
+    width: auto;
+    margin: 20px calc(var(--jn-mark-u-centre) - 8px) 0;
+  }
+
+  /* Step screens only — .jn-main--intro / --done set their own padding and
+     an unscoped .jn-main here would win on source order and flatten it. */
+  .jn-page:not(.jn-page--intro):not(.jn-page--done) .jn-main {
+    padding: 26px 28px calc(88px + env(safe-area-inset-bottom));
+  }
+
+  .jn-eyebrow {
+    font-size: 11.5px;
+  }
+
+  .jn-heading {
+    font-size: 24px;
+    /* Tight to the eyebrow above it — the label and the heading read as one
+       unit, so this gap is smaller than the one before the sub. */
+    margin-top: 12px;
+  }
+
+  /* Sized so the sub's first line ends under the last letter of the heading's
+     first line. On the city step that is "…you want to join." finishing below
+     the "t" of "Where do you want": the heading line inks 213.47px at 24px
+     Canela Text, and this sub line inks 214.45px at 16px SF Pro Display — a
+     1px overhang. Exact parity would be 15.93px; 16 is the round value and
+     lands closer to the reference, which overhangs by ~2px.
+
+     Note this parity is a property of these two particular strings — the
+     other steps set their own copy, so their lines land where their text
+     falls. */
+  .jn-sub {
+    font-size: 16px;
+    margin-top: 15px;
+  }
+
+  /* The aside is pinned to a fixed 21px "step down" from the old 24px sub;
+     against a 15px sub that made it the larger of the two. */
+  .jn-sub--aside span + span {
+    font-size: 13.5px;
+  }
+
+  /* ---- City picker ---- */
+
+  .jn-rail-label {
+    font-size: 11.5px;
+    margin: 0 0 10px;
+  }
+
+  /* 2×5 grid so ten launch cities fit a phone width without a sideways rail. */
+  .jn-cities {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+    overflow: visible;
+    margin-inline: 0;
+    padding-inline: 0;
+    scroll-snap-type: none;
+  }
+
+  .jn-city {
+    width: auto;
+    height: auto;
+    min-height: 0;
+    padding: 0 0 6px;
+    border-radius: 10px;
+  }
+
+  .jn-city--ghost {
+    height: auto;
+    min-height: 96px;
+  }
+
+  .jn-city-art {
+    height: 64px;
+  }
+
+  .jn-city-name {
+    font-size: 11px;
+    line-height: 1.2;
+    margin-top: 4px;
+    padding: 0 2px;
+  }
+
+  .jn-city-hint {
+    font-size: 13px;
+    margin-top: 14px;
+  }
+
+  .jn-or-label {
+    font-size: 11.5px;
+    margin: 20px 0 8px;
+  }
+
+  .jn-skip {
+    font-size: 18px;
+  }
+
+  /* Skip link and Continue sit close together on the artboard. */
+  /* The two gaps in this block are set by different properties — the space
+     above the skip link is .jn-actions' padding-top, the one below it is the
+     grid gap — so they had drifted to 32.44px and 13px. One value for both
+     puts the field, the skip and the button on an even rhythm.
+
+     Scoped to phones: the padding-top rule these override lives in the
+     <=1023 block, and tablet keeps its own larger spacing. */
+  .jn-actions {
+    gap: 20px;
+  }
+
+  .jn-page:not(.jn-page--intro):not(.jn-page--done) .jn-actions {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 4;
+    margin-top: 0;
+    padding: 12px 28px calc(16px + env(safe-area-inset-bottom));
+    background: var(--jn-paper);
+  }
+
+  /* ---- Campus: dropdown + none of these schools ---- */
+
+  /* .jn-input documents 16px as its intended size — the floor that stops
+     iOS Safari zooming the viewport on focus — but --bea-text-body-xl is
+     18px. Pin the documented value on mobile, where that zoom happens. */
+  .jn-input,
+  .jn-input::placeholder,
+  .jn-select .jn-select__control {
+    font-size: 16px;
+  }
+
+  .jn-page--campus .jn-sub {
+    font-size: 14px;
+    line-height: 1.45;
+    margin-top: 10px;
+  }
+
+  .jn-page--campus .jn-sub span {
+    display: inline;
+  }
+
+  .jn-or {
+    margin: 20px 0 16px;
+  }
+
+  .jn-or span {
+    font-size: 11.5px;
+  }
+
+  .jn-none {
+    font-size: 15px;
+  }
+
+  /* ---- Ambassador: credit rows ---- */
+
+  .jn-amb-row {
+    min-height: 63px;
+    padding: 8px 14px 8px 17px;
+    gap: 16px;
+  }
+
+  .jn-amb-badge {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Unlike the city step's green "Continue without a market", this one is a
+     small underlined link on the artboard. */
+  .jn-page--ambassador .jn-skip {
+    font-size: 13.5px;
+  }
+
+  /* ---- Basics: labelled fields ---- */
+
+  .jn-field-label {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  /* Both the field gap and the second label's inset are hardcoded on the
+     elements in JoinBasics.tsx; override them rather than edit the markup. */
+  .jn-field + .jn-field {
+    margin-top: 20px;
+  }
+
+  .jn-field + .jn-field .jn-field-label {
+    margin-bottom: 8px;
+  }
+
+  .jn-page--basics .jn-body,
+  .jn-page--email .jn-body {
+    margin-top: 23px;
+  }
+}
+
+/* ---------- Done screen ---------- */
+
+.jn-main--done {
+  flex: 1 1 auto;
+  padding: 24px 24px 44px;
+  align-items: center;
+}
+
+.jn-done-art {
+  width: 220px;
+  background: #fff;
+}
+
+.jn-done-art img {
+  width: 100%;
+  height: auto;
+  max-height: 280px;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+}
+
+.jn-done-title {
+  font-family: var(--jn-serif);
+  font-weight: 400;
+  font-size: 25px;
+  color: var(--jn-ink);
+  margin: 22px 0 0;
+}
+
+.jn-done-sub {
+  font-size: 16.65px;
+  line-height: 1.45;
+  color: var(--jn-slate);
+  margin: 12px 0 0;
+}
+
+.jn-done-sub strong {
+  font-weight: 700;
+}
+
+.jn-place {
+  width: 100%;
+  min-height: 176px;
+  background: var(--jn-tint);
+  border: 1px solid var(--jn-sel-soft);
+  border-radius: 12px;
+  padding: 24px 20px 20px;
+  margin-top: 26px;
+}
+
+.jn-place-label {
+  font-family: var(--jn-label);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--jn-eyebrow);
+  margin: 0;
+}
+
+/* The hash is set in the UI face and the figure in Canela display,
+   exactly as the artboard has it. */
+.jn-place-num {
+  font-family: var(--jn-display);
+  font-size: 71.8px;
+  line-height: 1.05;
+  color: var(--jn-ink);
+  margin: 8px 0 0;
+}
+
+.jn-place-hash {
+  font-family: var(--jn-ui);
+  font-weight: 400;
+}
+
+.jn-place-where {
+  font-size: 16.65px;
+  color: var(--jn-ink);
+  margin: 4px 0 0;
+}
+
+.jn-invite {
+  width: 100%;
+  margin-top: 26px;
+}
+
+.jn-invite-label {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--jn-ink);
+  margin: 0 0 10px;
+}
+
+.jn-invite-label::before,
+.jn-invite-label::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--jn-line);
+}
+
+.jn-invite-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--jn-field-h);
+  border: 1px solid #727272;
+  border-radius: var(--jn-control-radius);
+  background: #fff;
+  padding: 0 6px 0 14px;
+}
+
+.jn-invite-row input {
+  flex: 1 1 auto;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 16.65px;
+  font-weight: 500;
+  color: var(--jn-ink);
+  min-width: 0;
+  padding: 12px 0;
+}
+
+.jn-invite-row button {
+  border: 0;
+  background: transparent;
+  color: var(--jn-slate);
+  cursor: pointer;
+  padding: 9px;
+  line-height: 0;
+}
+
+/* The artboard draws this as a bordered button, not a bare link. */
+.jn-done-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: var(--jn-btn-h);
+  border: 1px solid var(--jn-blue);
+  border-radius: var(--jn-control-radius);
+  font-size: 12.5px;
+  font-weight: 500;
+  gap: 6px;
+  color: var(--jn-blue);
+  text-decoration: none;
+  margin-top: 20px;
+}
+
+/* ============================================================
+   Mobile done screen — scaled to the mobile artboard.
+
+   The confirmation ran at desktop sizes on phones: a 220px
+   illustration, a 25px title, 16.65px body and a 71.8px rank
+   numeral. This sits after the base .jn-done-* rules above so the
+   equal-specificity overrides actually win.
+   ============================================================ */
+@media (max-width: 767px) {
+  .jn-done-art {
+    width: 190px;
+  }
+
+  .jn-done-title {
+    font-size: 23px;
+  }
+
+  /* The artboard sets this narrower than the card below it, so it breaks
+     after "commences in" and "3 days." carries its own line. */
+  .jn-done-sub {
+    font-size: 15px;
+    max-width: 210px;
+    margin-inline: auto;
+  }
+
+  .jn-place-num {
+    font-size: 65px;
+  }
+
+  .jn-place-where {
+    font-size: 15px;
+  }
+}
+
+/* ============================================================
+   Desktop layer
+   ------------------------------------------------------------
+   Join steps are a single centered column — copy above, controls
+   below — so wide viewports don't open a hollow mid-gap.
+   Intro / done keep their two-pane layouts below.
+   ============================================================ */
+
+@media (min-width: 1024px) {
+  .jn-page {
+    min-height: 100vh;
+    min-height: 100svh;
+    --jn-side-pad: 48px;
+    --jn-col-gap: 48px;
+    /* Match the intro input + CTA: same height, fixed control width. */
+    --jn-field-h: 59px;
+    --jn-btn-h: 59px;
+    --jn-control-w: 440px;
+    --jn-btn-w: var(--jn-control-w);
+  }
+
+  /* ---- Header: same chrome as intro; dots pin to the right ---- */
+
+  .jn-top,
+  .jn-top--intro {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+    height: 98px;
+    padding: 0 var(--jn-side-pad);
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+    flex: none;
+  }
+
+  .jn-brand img {
+    height: 34px;
+  }
+
+  .jn-dots,
+  .jn-top--intro .jn-dots {
+    position: absolute;
+    right: var(--jn-side-pad);
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+    width: 200px;
+    max-width: 200px;
+  }
+
+  /* ---- Single column: copy, then controls + actions ---- */
+
+  .jn-col-copy,
+  .jn-col-actions {
+    display: block;
+    min-width: 0;
+    width: 100%;
+    max-width: var(--jn-control-w);
+  }
+
+  /* The step content sits in the same 1200px container as the header and the
+     intro screen, left-aligned with the wordmark, rather than a narrow column
+     floating in the middle of the viewport. */
+  .jn-page:not(.jn-page--intro):not(.jn-page--done) .jn-main {
+    align-items: flex-start;
+    max-width: 1200px;
+  }
+
+  /* Only the city rail spends that width — it is a horizontal scroller and
+     gains real estate from it. Every other control keeps the same measure as
+     the copy above it, so buttons and fields stay a readable length. */
+  .jn-col-copy,
+  .jn-col-actions {
+    max-width: none;
+  }
+
+  .jn-col-actions > .jn-body > *,
+  .jn-col-actions > .jn-actions {
+    max-width: var(--jn-control-w);
+  }
+
+  .jn-col-actions > .jn-body > .jn-cities-wrap {
+    max-width: none;
+  }
+
+  .jn-main {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 28px var(--jn-side-pad) 56px;
+    width: 100%;
+    max-width: none;
+    margin-inline: auto;
+  }
+
+  .jn-col-copy {
+    margin: 0 0 28px;
+  }
+
+  .jn-col-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .jn-eyebrow {
+    font-size: 12px;
+  }
+
+  .jn-heading {
+    font-size: 40px;
+    line-height: 1.15;
+    margin-top: 10px;
+    max-width: 20ch;
+  }
+
+  /* The artboard's line breaks are a mobile measure — rewrap freely. */
+  .jn-heading span {
+    display: inline;
+  }
+
+  .jn-heading span+span::before {
+    content: " ";
+  }
+
+  .jn-sub {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-top: 12px;
+    max-width: 36ch;
+  }
+
+  .jn-sub--aside span+span {
+    display: block;
+    font-size: 14px;
+    margin-top: 4px;
+  }
+
+  .jn-body {
+    margin-top: 0;
+    gap: 14px;
+    width: 100%;
+  }
+
+  .jn-actions {
+    margin-top: 0;
+    padding: 0;
+    width: 100%;
+    justify-items: stretch;
+    gap: 14px;
+  }
+
+  .jn-cta {
+    width: 100%;
+  }
+
+  .jn-error {
+    justify-self: start;
+    margin: 0;
+  }
+
+  .jn-skip {
+    font-size: 15px;
+    text-decoration: none;
+    text-align: center;
+    justify-self: center;
+  }
+
+  .jn-skip:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .jn-or {
+    margin: 18px 0;
+  }
+
+  /* ---- Steps with artwork: copy + controls left, illustration right ----
+     The .jn-step-art slot and the art/artSide props already existed on
+     JoinShell but nothing passed them, so the right half of these screens
+     sat empty. */
+  .jn-page--art .jn-main {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, var(--jn-control-w)) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: var(--jn-col-gap);
+    align-content: center;
+  }
+
+  .jn-page--art .jn-col-copy {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .jn-page--art .jn-col-actions {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  /* Positioned out of the grid flow. As a spanning grid item its height was
+     added to the two content rows, which pushed a gap between the copy and
+     the form below it as the artwork grew. */
+  .jn-page--art .jn-step-art {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(
+      var(--jn-side-pad) + var(--jn-control-w) + var(--jn-col-gap)
+    );
+    right: var(--jn-side-pad);
+    pointer-events: none;
+  }
+
+  /* Intrinsic sizing rather than a fixed box: the image grows until it hits
+     the column width or the height cap, whichever binds first, so it fills
+     the pane instead of floating letterboxed inside a 420px slot. */
+  .jn-page--art .jn-step-art img {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: min(74vh, 660px);
+    margin-inline: auto;
+    display: block;
+  }
+
+  /* The envelope is a small source image — hold it near native size rather
+     than upscaling it into a blur. Capped on the image so the pane itself
+     still spans the right half and keeps it centred there. */
+  .jn-page--email .jn-step-art img {
+    max-width: 340px;
+  }
+
+  /* These two carried a ~46px offset of their own on top of the 28px the
+     other steps use, so the form started lower on basics and email than
+     everywhere else in the flow. */
+  .jn-page--basics .jn-body,
+  .jn-page--email .jn-body {
+    margin-top: 0;
+  }
+
+  /* First name / Age are one group; 62px between them read as two. */
+  .jn-field + .jn-field {
+    margin-top: 10px;
+  }
+
+  /* ---- City ---- */
+
+  /* In a 440px column "Where do you want to date?" rewraps to orphan
+     "date?" on its own line. Keeping the artboard's own break gives two
+     balanced lines instead. */
+  .jn-page--city .jn-heading span {
+    display: block;
+  }
+
+  .jn-page--city .jn-heading span + span::before {
+    content: none;
+  }
+
+  /* Cards: the art box was a fixed 122px pinned to the bottom of a 240px
+     card, so the top third of every card was blank. Let it fill instead. */
+  .jn-page--city .jn-city {
+    width: 136px;
+    height: 188px;
+    transition:
+      transform 0.16s ease,
+      box-shadow 0.16s ease,
+      border-color 0.16s ease;
+  }
+
+  .jn-page--city .jn-city-art {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+    padding: 16px 14px 0;
+  }
+
+  .jn-page--city .jn-city-name {
+    font-size: 15px;
+    margin-top: 12px;
+  }
+
+  .jn-page--city .jn-city:hover {
+    transform: translateY(-4px);
+    border-color: var(--jn-sel-border);
+    box-shadow: 0 10px 24px rgba(22, 24, 26, 0.09);
+  }
+
+  .jn-page--city .jn-city--on {
+    transform: translateY(-4px);
+    box-shadow:
+      0 10px 24px rgba(22, 24, 26, 0.1),
+      0 0 0 1px var(--jn-sel-border);
+  }
+
+  /* A 427x294 source, so cap the width to keep the upscale gentle — the
+     shared rule would stretch it to the full 616px pane. */
+  /* A 427x294 source — hold it near native size rather than letting the
+     shared rule stretch it across the full 616px pane. */
+  .jn-page--city .jn-step-art img {
+    width: 500px;
+    max-width: 100%;
+  }
+
+  /* Keyboard users get the same affordance the pointer just gained. */
+  .jn-page--city .jn-city:focus-visible {
+    outline: 2px solid var(--jn-sel-border);
+    outline-offset: 3px;
+  }
+
+  /* overflow-x: auto computes overflow-y to auto as well, so the lift and
+     its shadow need room inside the rail or they get clipped. */
+  .jn-page--city .jn-cities {
+    padding: 6px 0 16px;
+  }
+
+  /* A labelled rule reads as a section break; a bare centred label floats. */
+  .jn-page--city .jn-or-label {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    max-width: 440px;
+    margin-top: 24px;
+  }
+
+  .jn-page--city .jn-or-label::before,
+  .jn-page--city .jn-or-label::after {
+    content: "";
+    flex: 1 1 auto;
+    height: 1px;
+    background: var(--jn-line);
+  }
+
+  /* The copy sits at the same left edge as every other step; only the card
+     rail spends the extra width. .jn-body is a column flex container, so
+     the controls need an explicit width to stretch to the control measure
+     rather than shrink to their content. */
+  .jn-page--city .jn-col-actions > .jn-body > *,
+  .jn-page--city .jn-col-actions > .jn-actions {
+    width: 100%;
+  }
+
+  /* 91px above this is a mobile-artboard value; at desktop it pushed
+     Continue below the fold on a 900px-tall viewport. */
+  .jn-page--city .jn-or-label {
+    margin-top: 28px;
+  }
+
+  .jn-page--city .jn-rail-label {
+    font-size: 12px;
+    margin-bottom: 16px;
+  }
+
+  .jn-page--city .jn-city-hint {
+    max-width: 440px;
+    font-size: 15px;
+  }
+
+  .jn-cities-wrap {
+    margin: 0;
+    padding-right: 48px;
+  }
+
+  .jn-cities-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    right: 0;
+    z-index: 2;
+    width: 40px;
+    height: 40px;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--jn-line-card);
+    border-radius: 999px;
+    background: #fff;
+    color: #1a1a1a;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    transform: translateY(-50%);
+  }
+
+  .jn-cities-nav:hover {
+    background: #f7f7f7;
+  }
+
+  .jn-cities {
+    margin: 0;
+    padding: 0;
+    gap: 12px;
+    scroll-padding-left: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    display: flex;
+    max-height: none;
+  }
+
+  .jn-city {
+    width: 148px;
+    height: 240px;
+    border-radius: 14px;
+    padding-bottom: 10px;
+  }
+
+  .jn-city-art {
+    height: 122px;
+  }
+
+  .jn-city-art img {
+    object-fit: contain;
+    object-position: center bottom;
+  }
+
+  .jn-city-name {
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 8px;
+  }
+
+  .jn-page--city .jn-cities {
+    max-height: none;
+    overflow-y: hidden;
+    overflow-x: auto;
+  }
+
+  .jn-optout {
+    padding: 12px 24px;
+    font-size: 15px;
+  }
+
+  /* ---- Campus & basics ---- */
+
+  .jn-page--campus .jn-sub span,
+  .jn-page--basics .jn-sub span {
+    display: inline;
+  }
+
+  .jn-page--campus .jn-sub span+span::before,
+  .jn-page--basics .jn-sub span+span::before {
+    content: " ";
+  }
+
+  .jn-page--campus .jn-heading,
+  .jn-page--ambassador .jn-heading,
+  .jn-page--email .jn-heading {
+    max-width: 16ch;
+  }
+
+  /* ---- Ambassadors: one clean list in the column ---- */
+
+  .jn-amb {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    align-content: start;
+  }
+
+  .jn-amb-row {
+    min-height: 66px;
+    height: auto;
+  }
+
+  .jn-amb-name {
+    line-height: 1.3;
+  }
+
+  .jn-cta svg {
+    right: 22px;
+  }
+
+  /* ---- Intro: copy left, illustration right ---- */
+
+  .jn-page--intro,
+  .jn-page--done {
+    text-align: left;
+  }
+
+  .jn-intro-copy {
+    display: block;
+  }
+
+  /* Proportional columns rather than a hard 440px copy column: the copy
+     needs to grow with the title, and pinning it to the control width meant
+     the 60px heading ran past its own column into the illustration on every
+     viewport under ~1280. The two tracks now share the container, with the
+     copy given a hair more of it. */
+  .jn-main--intro {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-rows: auto;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+    column-gap: clamp(32px, 3.4vw, 56px);
+    align-items: center;
+    align-content: center;
+    /* Uneven block padding: optically the composition wants to sit a little
+       above the true centre, under the wordmark. */
+    padding: 8px var(--jn-side-pad) 40px;
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+  }
+
+  /* Fluid rather than a flat 60px, so the forced line breaks in the heading
+     always fit the column they are in: ~45px at 1024, the full 60px from
+     ~1360 up. */
+  .jn-intro-title {
+    font-size: clamp(2.75rem, 4.2vw, 3.5rem); /* 44px → 56px */
+    line-height: var(--bea-leading-display-tight);
+    letter-spacing: var(--bea-tracking-display-tight);
+    text-wrap: balance;
+  }
+
+  /* 18px read thin under a 56px display line; 20px keeps the step between
+     heading and body legible without competing with the title. */
+  .jn-intro-sub {
+    font-size: 1.25rem; /* 20px */
+    line-height: var(--bea-leading-body);
+    margin-top: 20px;
+    max-width: 38ch;
+  }
+
+  /* The illustration moves to its own column. */
+  /* The illustration is the anchor on this screen, so it spends its whole
+     column rather than sitting capped inside it with a channel of empty
+     paper on either side. */
+  .jn-intro-art {
+    width: 100%;
+    margin: 0;
+    align-self: center;
+    justify-self: center;
+    max-width: none;
+  }
+
+  .jn-intro-art img {
+    padding-left: 0;
+  }
+
+  /* Same width/height stack as every other step's field + Continue. */
+  .jn-intro-form {
+    width: 100%;
+    max-width: var(--jn-control-w);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    margin-top: 34px;
+  }
+
+  .jn-intro-form .jn-cta {
+    width: 100%;
+  }
+
+  .jn-intro-form .jn-field-label {
+    margin-bottom: -4px;
+  }
+
+  /* Errors belong under the field they refer to, not beside it. */
+  .jn-intro-form .jn-error {
+    margin: -2px 0 0;
+  }
+
+  .jn-promise {
+    margin-top: 18px;
+  }
+
+  /* ---- Done: illustration left, detail right ---- */
+
+  /* Was uncapped, so on a 1440 screen the right column ran to 648px with a
+     56px title and a 72px numeral. It now shares the 1200px container and
+     the control width every other screen uses. */
+  .jn-main--done {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-rows: auto;
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--jn-control-w));
+    column-gap: var(--jn-col-gap);
+    align-items: center;
+    align-content: center;
+    padding: 0 var(--jn-side-pad);
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+  }
+
+  .jn-done-art {
+    grid-column: 1;
+    grid-row: 1 / span 5;
+    width: 100%;
+    max-width: 400px;
+    justify-self: center;
+    align-self: center;
+  }
+
+  .jn-done-art img {
+    max-height: min(68vh, 620px);
+  }
+
+  .jn-done-title {
+    grid-column: 2;
+    font-size: 40px;
+    margin: 0;
+  }
+
+  .jn-done-sub {
+    grid-column: 2;
+    font-size: 18px;
+    margin-top: 12px;
+  }
+
+  .jn-place {
+    grid-column: 2;
+    margin-top: 26px;
+    padding: 24px 28px;
+    border-radius: 14px;
+  }
+
+  .jn-place-num {
+    font-size: 56px;
+  }
+
+  .jn-place-where {
+    font-size: 15px;
+  }
+
+  .jn-invite {
+    grid-column: 2;
+    margin-top: 24px;
+  }
+
+  .jn-done-link {
+    grid-column: 2;
+    margin-top: 20px;
+    justify-self: start;
+  }
+}
+
+/* ---------- Already-on-waitlist modal ---------- */
+
+.jn-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(26, 26, 26, 0.5);
+}
+
+.jn-modal-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 28px 24px 24px;
+  border-radius: 12px;
+  background: #fff;
+  text-align: center;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.16);
+}
+
+.jn-modal-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 14px;
+  border-radius: 50%;
+  background: #fdf0ec;
+  color: #b3452f;
+}
+
+.jn-modal-title {
+  margin: 0 0 10px;
+  font-family: var(--jn-serif);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.25;
+  color: var(--jn-ink);
+}
+
+.jn-modal-message {
+  margin: 0 0 22px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--jn-body);
+}
+
+.jn-modal-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.jn-modal-cta {
+  width: 100%;
+  height: var(--jn-btn-h);
+  border: 0;
+  border-radius: 10px;
+  background: var(--jn-green-btn);
+  color: #fff;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.jn-modal-dismiss {
+  border: 0;
+  background: transparent;
+  color: var(--jn-body);
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 4px 0;
+}
+
+/* ---------- Loading motion ---------- */
+
+@keyframes jn-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@keyframes jn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jn-city--ghost,
+  .jn-amb-row--ghost,
+  .jn-results-skel,
+  .jn-cta-spin {
+    animation: none;
+  }
+
+  .jn-city--ghost,
+  .jn-amb-row--ghost,
+  .jn-results-skel {
+    background: #eeebe8;
+  }
+}
+
+/* ============================================================
+   Intro screen on tablets (768 – 1023).
+
+   This band had no rules of its own: it inherited the phone layout's
+   ordering but none of its `--u` scaling, and none of the desktop
+   two-pane layout. The result was a 32px heading, a 353px illustration
+   and a full-bleed email field and button running the entire width of
+   an iPad — three different measures on one screen.
+
+   It stays a single centred column (portrait tablets are the common
+   case here, and two panes at 768 would squeeze both), but every
+   element is now measured against the same column rather than against
+   the viewport.
+   ============================================================ */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .jn-page--intro {
+    /* One control scale for the field and the button, sized up from the
+       phone's 44/48 to suit the wider column. */
+    --jn-field-h: 56px;
+    --jn-btn-h: 56px;
+    --jn-intro-measure: 620px;
+    --jn-intro-form-w: 448px;
+  }
+
+  .jn-top--intro {
+    padding: 36px 40px 0;
+  }
+
+  .jn-brand img {
+    height: 26px;
+  }
+
+  /* The rail fell through to the 180px base here, which packed the five nodes
+     41px apart on a 13px connector — tighter than the phone's 73px on a screen
+     twice the width, because the base value was authored for the narrow
+     desktop rail. Flat across the band, like the type and the controls. */
+  .jn-dots {
+    width: 400px;
+    margin-top: 24px;
+  }
+
+  /* `margin-block: auto` rather than `justify-content: center` so the column
+     centres when there is room and simply top-aligns when there isn't —
+     centring an overflowing flex item pushes its head off the top of the
+     scroll area. */
+  .jn-main--intro {
+    flex: 0 1 auto;
+    margin-block: auto;
+    justify-content: flex-start;
+    width: 100%;
+    max-width: calc(var(--jn-intro-measure) + 80px);
+    margin-inline: auto;
+    padding: 40px 40px 56px;
+  }
+
+  /* Flat, not fluid. The form below is a fixed 448px right across this band,
+     so type that scales with the viewport drifts against it — the heading
+     measured 71% of the field's width at 1023 but only 56% at 768, which is
+     what made the copy look undersized on a portrait tablet. A constant size
+     holds the heading at ~71% and the sub at ~66% of the field everywhere in
+     the band, the proportion the phone layout has. */
+  .jn-intro-title {
+    font-size: 3.25rem; /* 52px */
+    line-height: 1.24;
+    letter-spacing: var(--bea-tracking-heading);
+    max-width: var(--jn-intro-measure);
+  }
+
+  .jn-intro-sub {
+    font-size: 1.375rem; /* 22px */
+    line-height: 1.6;
+    margin-top: 22px;
+    max-width: 46ch;
+    color: #7d7d7d;
+  }
+
+  /* Centred and capped instead of the phone's right-edge bleed — at this
+     width the bleed reads as a crop rather than a composition. */
+  .jn-intro-art {
+    width: 100%;
+    max-width: 480px;
+    margin: 36px auto 0;
+    align-self: center;
+  }
+
+  .jn-intro-art img {
+    padding-left: 0;
+  }
+
+  /* The form is the one thing that must not track the column width: a 900px
+     email field is unusable and looks broken. It keeps a fixed measure and
+     centres under the copy. */
+  .jn-intro-form {
+    width: 100%;
+    max-width: var(--jn-intro-form-w);
+    margin: 40px auto 0;
+    gap: 0;
+  }
+
+  .jn-intro-form .jn-field-label {
+    font-size: 0.9375rem; /* 15px */
+    margin-bottom: 10px;
+  }
+
+  .jn-intro-form .jn-input {
+    font-size: 1rem; /* stays >= 16px so iOS never zooms on focus */
+  }
+
+  .jn-intro-form .jn-input::placeholder {
+    font-size: 1rem;
+  }
+
+  .jn-intro-form .jn-input-icon {
+    left: 16px;
+  }
+
+  .jn-intro-form .jn-input--icon {
+    padding-left: 50px;
+  }
+
+  .jn-intro-form .jn-error {
+    margin-top: 8px;
+  }
+
+  /* Overrides the ≤1023 rule's 28px — the field is taller here. */
+  .jn-intro-form .jn-cta {
+    height: var(--jn-btn-h);
+    margin-top: 20px;
+    font-size: 1.25rem; /* 20px — a step above the 18px base, as the field is */
+  }
+
+  .jn-intro-form .jn-cta svg {
+    right: 28px;
+  }
+
+  .jn-promise {
+    font-size: 0.9375rem; /* 15px */
+    gap: 10px;
+    margin-top: 22px;
+  }
+
+  .jn-promise svg {
+    flex: 0 0 auto;
+    width: 17px;
+    height: 15px;
+  }
+}
+
+/* ============================================================
+   Confirmation screen — artboards 7-24 / 7-25
+   ------------------------------------------------------------
+   Mobile is the reference; the desktop rules at the end widen the
+   column rather than changing the design. Colours sampled from the
+   artboards, not matched by eye.
+   ============================================================ */
+
+.jn-place-number {
+  font-family: var(--jn-ui);
+  font-size: 52px;
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: var(--jn-ink);
+  text-align: center;
+  margin: 14px 0 0;
+}
+
+/* Centred label with a hairline running out to both edges. */
+.jn-rule {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 34px 0 0;
+  font-family: var(--jn-ui);
+  font-size: 15px;
+  color: var(--jn-ink);
+}
+
+.jn-rule::before,
+.jn-rule::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e2e0dc;
+}
+
+.jn-unlocks {
+  list-style: none;
+  margin: 22px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.jn-unlock {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+}
+
+.jn-unlock-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.jn-unlock-icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.jn-unlock-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.jn-unlock-title {
+  font-family: var(--jn-ui);
+  font-size: 18px;
+  color: var(--jn-ink);
+}
+
+.jn-unlock-detail {
+  font-family: var(--jn-ui);
+  font-size: 13.5px;
+  color: var(--jn-body);
+}
+
+.jn-unlock-friends {
+  font-family: var(--jn-ui);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.jn-linkfield {
+  margin-top: 22px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ffffff;
+  border: 1px solid #e5e3df;
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+
+.jn-linkfield-url {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--jn-ui);
+  font-size: 15px;
+  color: var(--jn-ink);
+}
+
+.jn-linkfield-copy {
+  flex: 0 0 auto;
+  background: none;
+  border: 0;
+  padding: 2px;
+  color: var(--jn-ink);
+  cursor: pointer;
+}
+
+.jn-linkfield-copy:hover {
+  opacity: 0.7;
+}
+
+.jn-done-exit {
+  display: block;
+  margin: 26px auto 0;
+  font-family: var(--jn-ui);
+  font-size: 17px;
+  color: var(--jn-ink);
+  text-decoration: none;
+  text-align: center;
+}
+
+.jn-done-exit:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* "We'll never share your email." under the first step's fields. */
+.jn-reassure {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 28px;
+  font-family: var(--jn-ui);
+  font-size: 13px;
+  color: var(--jn-body);
+}
+
+/* Desktop: the artboards are mobile only, so the column simply widens and
+   centres rather than picking up a different layout. */
+@media (min-width: 768px) {
+  .jn-main--done {
+    max-width: 560px;
+    margin-inline: auto;
+  }
+
+  .jn-place-number {
+    font-size: 64px;
+  }
+
+  .jn-unlock-title {
+    font-size: 19px;
+  }
+}
+
+/* ============================================================
+   Join flow — centred column (artboards 7-07 / 7-08)
+   ------------------------------------------------------------
+   The current artboards centre the brand, heading and subtitle and
+   drop the step indicator. Appended so it overrides the left-aligned
+   base rules without editing each one.
+   ============================================================ */
+
+.jn-page--basics .jn-top,
+.jn-page--city .jn-top {
+  justify-content: center;
+}
+
+.jn-page--basics .jn-col-copy,
+.jn-page--city .jn-col-copy {
+  text-align: center;
+}
+
+.jn-page--basics .jn-heading,
+.jn-page--city .jn-heading,
+.jn-page--basics .jn-sub,
+.jn-page--city .jn-sub {
+  text-align: center;
+}
+
+/* No eyebrow on either screen in the artboards; the copy object carries an
+   empty string, so collapse the element rather than leaving a gap. */
+.jn-page--basics .jn-eyebrow:empty,
+.jn-page--city .jn-eyebrow:empty {
+  display: none;
+}
+
+/* "CHOOSE YOUR LAUNCH CITY" is centred and small above the rail. */
+.jn-page--city .jn-rail-label {
+  text-align: center;
+}
+
+/* Two rows that scroll sideways together, as drawn — five cards visible on a
+   phone, the rest reached by swiping. */
+.jn-page--city .jn-cities {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(2, auto);
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+
+.jn-page--city .jn-cities > li {
+  scroll-snap-align: start;
+}
+
+/* "Dont see your city?" sits below the rail, left aligned against it. */
+.jn-page--city .jn-city-hint {
+  text-align: left;
+}
+
+@media (min-width: 768px) {
+  .jn-page--basics .jn-col-copy,
+  .jn-page--city .jn-col-copy,
+  .jn-page--basics .jn-col-actions,
+  .jn-page--city .jn-col-actions {
+    max-width: 560px;
+    margin-inline: auto;
+  }
+}
+
+/* Measured mobile values live behind this query so the existing desktop
+   rules (>=1024px) keep their larger card rail. */
+@media (max-width: 1023px) {
+  /* ============================================================
+     Join flow — measured off the 390px artboards (7-07 / 7-08)
+     ------------------------------------------------------------
+     The base rules above were derived from the older 562pt boards and
+     scaled by 0.694; the current boards are 390px native, so the card
+     rail came out at roughly double size. Values here are measured from
+     the PNGs in CSS pixels rather than converted.
+     ============================================================ */
+
+  .jn-page--city .jn-cities {
+    /* 4.8px between columns, 19.6px between the two rows. */
+    column-gap: 4.8px;
+    row-gap: 19.6px;
+  }
+
+  .jn-page--city .jn-city {
+    width: 74.8px;
+    height: 108.6px;
+    border-radius: 8px;
+    padding: 0 0 7px;
+  }
+
+  /* 8px cap height in the artboard — the label sits at the foot of the card. */
+  .jn-page--city .jn-city-name {
+    font-size: 11px;
+    line-height: 1.2;
+  }
+
+  /* "CHOOSE YOUR LAUNCH CITY" — 10px, not the 14px the old boards used. */
+  .jn-page--city .jn-rail-label {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    margin: 0 0 18.6px;
+    padding-inline-start: 0;
+  }
+
+  /* Heading and subtitle: 34px and 22px line steps, measured between the
+     baselines of the two wrapped lines on each. */
+  .jn-page--basics .jn-heading,
+  .jn-page--city .jn-heading {
+    font-size: 24px;
+    line-height: 34px;
+    margin-top: 41px;
+  }
+
+  .jn-page--basics .jn-sub,
+  .jn-page--city .jn-sub {
+    font-size: 14px;
+    line-height: 22px;
+    margin-top: 41px;
+  }
+
+  .jn-page--city .jn-city-hint {
+    font-size: 11px;
+    line-height: 17px;
+    margin-top: 26px;
+  }
+
+  /* Brand mark sits 90px down, 41px clear of the heading. */
+  .jn-page--basics .jn-top,
+  .jn-page--city .jn-top {
+    padding-top: 90px;
+    padding-bottom: 0;
+  }
+
+}
+
+/* Header: .jn-top has no display:flex, so justify-content did nothing and the
+   wordmark stayed left. The brand is inline-flex, so text-align centres it. */
+.jn-page--basics .jn-top,
+.jn-page--city .jn-top {
+  text-align: center;
+}
+
+/* "Don't see your city?" and its answer sit on separate lines. */
+.jn-city-hint {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.jn-city-hint-q {
+  font-weight: 700;
+}
+
+.jn-city-hint-a {
+  font-weight: 400;
+}
+
+/* ============================================================
+   Screen 1 — measured off artboard 7-07 (390px)
+   ============================================================ */
+@media (max-width: 1023px) {
+  /* Fields are notably narrower than the button: 240px centred against the
+     button's 356px. Measured at 75px and 17px side margins respectively. */
+  .jn-page--basics .jn-field,
+  .jn-page--basics .jn-input {
+    max-width: 240px;
+    margin-inline: auto;
+  }
+
+  .jn-page--basics .jn-input,
+  .jn-page--basics .jn-field {
+    height: 50px;
+  }
+
+  /* 33.8px from the first field's underside to the second field's label. */
+  .jn-page--basics .jn-field--second {
+    margin-top: 33.8px;
+  }
+
+  .jn-page--basics .jn-cta,
+  .jn-page--city .jn-cta {
+    height: 55px;
+  }
+
+  /* Page gutter is 17px, matching the button, not the 36.73px base. */
+  .jn-page--basics .jn-main,
+  .jn-page--city .jn-main {
+    padding-inline: 17px;
+  }
+
+  /* Heading sits 108px below the wordmark on this screen. */
+  .jn-page--basics .jn-heading {
+    margin-top: 108px;
+  }
+
+  .jn-page--basics .jn-sub {
+    margin-top: 39px;
+  }
+}
+
+/* The reassurance line is pinned above the button in artboard 7-07 — 22px
+   clear of it — not tucked under the email field. The space above it is
+   elastic, so it holds position as the viewport grows. */
+@media (max-width: 1023px) {
+  .jn-page--basics .jn-main {
+    flex: 1 1 auto;
+  }
+
+  .jn-page--basics .jn-body {
+    flex: 1 1 auto;
+  }
+
+  .jn-page--basics .jn-reassure {
+    margin-top: auto;
+    margin-bottom: 0;
+  }
+
+  .jn-page--basics .jn-actions {
+    margin-top: 22px;
+    padding-top: 0;
+  }
+}
+
+/* The join headings are set in the humanist sans in the artboards — Lato, not
+   Canela. The base rule points .jn-heading at --jn-serif, which is why "Join
+   the waitlist" and "Where do you want to date?" were rendering as a serif. */
+.jn-page--basics .jn-heading,
+.jn-page--city .jn-heading {
+  font-family: var(--font-lato), var(--jn-ui);
+  font-weight: 400;
+}
+
+/* Subtitle, field labels and the reassurance line are the same Lato as the
+   heading in the artboards. .jn-sub was pointing at SF Pro, which differs
+   most visibly in the 'a' and 'y'. */
+.jn-page--basics .jn-sub,
+.jn-page--city .jn-sub,
+.jn-page--basics .jn-field-label,
+.jn-page--basics .jn-input,
+.jn-page--basics .jn-reassure,
+.jn-page--city .jn-city-hint {
+  font-family: var(--font-lato), var(--jn-ui);
+}
+
+/* ============================================================
+   Join flow — desktop (basics + city)
+   ------------------------------------------------------------
+   These two artboards are a single centred column with no side artwork,
+   so desktop widens that column rather than switching to the two-column
+   art layout the other steps use. Two shared rules had to be undone:
+
+   1. `.jn-page:not(--intro):not(--done) .jn-main` (>=1024px) sets
+      align-items:flex-start at 1200px wide — that left-aligned the copy
+      while the rail spent the full width, splitting the screen in two.
+   2. `.jn-heading` and `.jn-sub` (>=1024px) carry ch-based max-widths.
+      As blocks with no auto margin they sat flush against the column's
+      left edge and centred their text inside those two *different*
+      narrower boxes — which is why the heading and the subtitle each
+      landed on their own axis, both left of the fields below them.
+
+   Selectors here match the specificity of what they override (hence the
+   :not() pairs) and come last in the file, so they win.
+   ============================================================ */
+@media (min-width: 768px) {
+  .jn-page--basics:not(.jn-page--intro):not(.jn-page--done) .jn-main,
+  .jn-page--city:not(.jn-page--intro):not(.jn-page--done) .jn-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 560px;
+    margin-inline: auto;
+  }
+
+  /* Each section spans the column, so everything shares one measure. */
+  .jn-page--basics .jn-col-copy,
+  .jn-page--city .jn-col-copy,
+  .jn-page--basics .jn-col-actions,
+  .jn-page--city .jn-col-actions,
+  .jn-page--basics .jn-body,
+  .jn-page--city .jn-body,
+  .jn-page--basics .jn-actions,
+  .jn-page--city .jn-actions {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Point (2) above: centre the boxes, not just the text inside them. */
+  .jn-page--basics .jn-heading,
+  .jn-page--city .jn-heading,
+  .jn-page--basics .jn-sub,
+  .jn-page--city .jn-sub {
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  /* Fields, rail and button take the column's width rather than the
+     440px measure the two-column steps share. */
+  .jn-page--basics .jn-col-actions > .jn-body > *,
+  .jn-page--city .jn-col-actions > .jn-body > *,
+  .jn-page--basics .jn-col-actions > .jn-actions,
+  .jn-page--city .jn-col-actions > .jn-actions,
+  .jn-page--city .jn-col-actions > .jn-body > .jn-cities-wrap {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Ten cards in two rows fit the column without scrolling, so centre the
+     track. `safe` keeps the first card reachable if it ever does overflow. */
+  .jn-page--city .jn-cities {
+    justify-content: center;
+    justify-content: safe center;
+  }
+
+  /* Everything that is centred copy stays centred at desktop too. */
+  .jn-page--basics .jn-reassure {
+    justify-content: center;
+  }
+
+  /* .jn-city-hint is a *column* flex (question over answer), so the
+     horizontal axis is align-items, not justify-content. */
+  .jn-page--city .jn-city-hint {
+    align-items: center;
+  }
+
+  .jn-page--city .jn-rail-label,
+  .jn-page--city .jn-city-hint {
+    text-align: center;
+  }
+}
+
+/* ============================================================
+   Done screen (artboards 7-24 / 7-25) — desktop
+   ------------------------------------------------------------
+   The >=1024px rules still lay .jn-main--done out as a two-column grid
+   (`minmax(0,1fr) minmax(0, var(--jn-control-w))`) with the left track
+   reserved for .jn-done-art — but the rewrite to these artboards dropped
+   that illustration, so nothing fills column 1. The remaining eight flat
+   children auto-placed into the grid instead, zig-zagging between a
+   collapsed 1fr track and the 440px one. The same block also flips the
+   page to text-align:left.
+
+   These artboards are the mobile column at every width, so mirror what
+   `@media (max-width: 767px)` already does and cap the measure.
+   (.jn-done-art's own rules are left in place — inert while nothing
+   renders it, ready if the illustration comes back.)
+   ============================================================ */
+.jn-page--done {
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .jn-page--done .jn-main--done {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-content: normal;
+    width: 100%;
+    max-width: 560px;
+    margin-inline: auto;
+    padding: 24px 24px 44px;
+  }
+}
