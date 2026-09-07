@@ -1,0 +1,442 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────
+
+enum UserRole {
+  NORMAL_USER
+  AMBASSADOR
+  ADMIN
+}
+
+enum ReferralStatus {
+  PENDING
+  COUNTED
+  REJECTED
+}
+
+enum CompetitionStatus {
+  DRAFT
+  ACTIVE
+  GRACE_PERIOD
+  COMPLETED
+}
+
+enum RewardType {
+  PHYSICAL
+  DIGITAL
+  EXPERIENCE
+  CASH
+}
+
+enum UnlockType {
+  AUTOMATIC
+  MANUAL
+  RANKED
+}
+
+enum AudienceType {
+  ALL
+  AMBASSADOR
+  NORMAL_USER
+}
+
+enum RewardUnlockStatus {
+  LOCKED
+  UNLOCKED
+  OUT_OF_STOCK
+  UNAVAILABLE
+  REQUESTED
+  APPROVED
+  REJECTED
+  CANCELLED
+  REDEEMED
+  EXPIRED
+}
+
+enum RuleOperator {
+  ALL
+  ANY
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PointCategory {
+  INVITE
+  PROMPT
+  PARTICIPATION
+  BONUS
+}
+
+enum EventType {
+  COMPETITION_START
+  COMPETITION_END
+  PRIZE_UNLOCK
+  DEADLINE
+  ANNOUNCEMENT
+  OTHER
+}
+
+// ─────────────────────────────────────────────
+// Core Models
+// ─────────────────────────────────────────────
+
+model User {
+  id                    String    @id @default(uuid())
+  email                 String    @unique
+  fullName              String?
+  passwordHash          String?
+  role                  UserRole  @default(NORMAL_USER)
+  referralCode          String    @unique @default(uuid())
+  waitlistPosition      Int?
+  emailVerifiedAt       DateTime?
+  onboardingCompletedAt DateTime?
+  lastLoginAt           DateTime?
+  instagram             String?
+  graduationYear        Int?
+  isActive              Boolean   @default(true)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  // Relations
+  schoolId String?
+  school   School? @relation(fields: [schoolId], references: [id])
+
+  marketId String?
+  market   Market? @relation(fields: [marketId], references: [id])
+
+  // Referrals
+  referralsGiven    ReferralRelation[] @relation("ReferrerRelation")
+  referralsReceived ReferralRelation[] @relation("ReferredRelation")
+
+  // Points, rewards, orders
+  pointsLedger     PointsLedger[]
+  rewardRedemptions RewardRedemption[]
+  orders           Order[]
+  magicLinkTokens  MagicLinkToken[]
+  passwordResetTokens PasswordResetToken[]
+  ambassadorInvites AmbassadorInvite[] @relation("InvitedUser")
+  sentInvites       AmbassadorInvite[] @relation("InviterUser")
+
+  @@map("users")
+}
+
+model School {
+  id        String   @id @default(uuid())
+  name      String
+  city      String?
+  state     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  marketId String?
+  market   Market? @relation(fields: [marketId], references: [id])
+
+  users User[]
+
+  @@map("schools")
+}
+
+model Market {
+  id        String   @id @default(uuid())
+  name      String
+  city      String?
+  state     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  schools School[]
+  users   User[]
+
+  @@map("markets")
+}
+
+model ReferralRelation {
+  id           String         @id @default(uuid())
+  referrerId   String
+  referredId   String
+  depth        Int            @default(1)
+  status       ReferralStatus @default(PENDING)
+  countedAt    DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  referrer User @relation("ReferrerRelation", fields: [referrerId], references: [id])
+  referred User @relation("ReferredRelation", fields: [referredId], references: [id])
+
+  @@unique([referrerId, referredId])
+  @@map("referral_relations")
+}
+
+// ─────────────────────────────────────────────
+// Auth Tokens
+// ─────────────────────────────────────────────
+
+model MagicLinkToken {
+  id        String    @id @default(uuid())
+  token     String    @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("magic_link_tokens")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  token     String    @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
+}
+
+model AmbassadorInvite {
+  id          String    @id @default(uuid())
+  email       String
+  token       String    @unique @default(uuid())
+  inviterId   String
+  invitedId   String?
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  inviter User  @relation("InviterUser", fields: [inviterId], references: [id])
+  invited User? @relation("InvitedUser", fields: [invitedId], references: [id])
+
+  @@map("ambassador_invites")
+}
+
+// ─────────────────────────────────────────────
+// Competition
+// ─────────────────────────────────────────────
+
+model Competition {
+  id                  String            @id @default(uuid())
+  title               String
+  description         String?
+  status              CompetitionStatus @default(DRAFT)
+  startDate           DateTime
+  endDate             DateTime
+  gracePeriodEndDate  DateTime?
+  isExtended          Boolean           @default(false)
+  scoringOpen         Boolean           @default(false)
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  @@map("competitions")
+}
+
+// ─────────────────────────────────────────────
+// Points
+// ─────────────────────────────────────────────
+
+model PointRule {
+  id          String        @id @default(uuid())
+  name        String        @unique
+  description String?
+  sourceType  String
+  points      Int
+  category    PointCategory @default(BONUS)
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("point_rules")
+}
+
+model PointsLedger {
+  id            String        @id @default(uuid())
+  userId        String
+  points        Int
+  sourceType    String
+  sourceId      String?
+  pointCategory PointCategory?
+  description   String?
+  createdAt     DateTime      @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("points_ledger")
+}
+
+// ─────────────────────────────────────────────
+// Rewards
+// ─────────────────────────────────────────────
+
+model Reward {
+  id               String       @id @default(uuid())
+  title            String
+  description      String?
+  rewardType       RewardType   @default(PHYSICAL)
+  unlockType       UnlockType   @default(AUTOMATIC)
+  audienceType     AudienceType @default(ALL)
+  ruleOperator     RuleOperator @default(ALL)
+  requiredPoints   Int?
+  requiredInvites  Int          @default(0)
+  requiredRank     Int?
+  requiredAppDownloads Int?
+  quantity         Int?
+  reserved         Int          @default(0)
+  redeemed         Int          @default(0)
+  isActive         Boolean      @default(true)
+  status           String       @default("ACTIVE")
+  imageUrl         String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  redemptions RewardRedemption[]
+
+  @@map("rewards")
+}
+
+model RewardRedemption {
+  id        String             @id @default(uuid())
+  userId    String
+  rewardId  String
+  status    RewardUnlockStatus @default(REQUESTED)
+  notes     String?
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reward Reward @relation(fields: [rewardId], references: [id])
+
+  @@map("reward_redemptions")
+}
+
+// ─────────────────────────────────────────────
+// Shop & Orders
+// ─────────────────────────────────────────────
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  price       Float
+  stock       Int      @default(0)
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  stripePriceId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orders Order[]
+
+  @@map("products")
+}
+
+model Order {
+  id                   String      @id @default(uuid())
+  userId               String
+  productId            String
+  quantity             Int         @default(1)
+  totalAmount          Float
+  status               OrderStatus @default(PENDING)
+  stripePaymentIntentId String?
+  stripeSessionId      String?
+  shippingAddress      String?
+  notes                String?
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("orders")
+}
+
+// ─────────────────────────────────────────────
+// Ambassador Calendar
+// ─────────────────────────────────────────────
+
+model CalendarEvent {
+  id          String    @id @default(uuid())
+  title       String
+  description String?
+  date        DateTime
+  type        EventType @default(OTHER)
+  isPublic    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("calendar_events")
+}
+
+// ─────────────────────────────────────────────
+// Forum / Prompts
+// ─────────────────────────────────────────────
+
+model Prompt {
+  id          String   @id @default(uuid())
+  question    String
+  category    String?
+  isActive    Boolean  @default(true)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  responses PromptResponse[]
+
+  @@map("prompts")
+}
+
+model PromptResponse {
+  id           String   @id @default(uuid())
+  promptId     String
+  userId       String
+  responseText String
+  isApproved   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  prompt Prompt @relation(fields: [promptId], references: [id])
+
+  @@map("prompt_responses")
+}
+
+// ─────────────────────────────────────────────
+// Audit Log
+// ─────────────────────────────────────────────
+
+model AuditEvent {
+  id         String   @id @default(uuid())
+  userId     String?
+  action     String
+  entityType String?
+  entityId   String?
+  metadata   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@map("audit_events")
+}
