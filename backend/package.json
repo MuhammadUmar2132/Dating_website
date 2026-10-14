@@ -1,12 +1,12 @@
 {
   "name": "bea-backend",
   "version": "1.0.0",
-  "description": "Bea Dating/Competition Platform — Express + PostgreSQL Backend",
+  "description": "Bea Dating/Competition Platform \u2014 Express + PostgreSQL Backend",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
+    "dev": "node init && ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "node init && tsc",
+    "start": "node init && node dist/index.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",

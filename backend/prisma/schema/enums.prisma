@@ -1,0 +1,84 @@
+// ─────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────
+
+enum UserRole {
+  NORMAL_USER
+  AMBASSADOR
+  ADMIN
+}
+
+enum ReferralStatus {
+  PENDING
+  COUNTED
+  REJECTED
+}
+
+enum CompetitionStatus {
+  DRAFT
+  ACTIVE
+  GRACE_PERIOD
+  COMPLETED
+}
+
+enum RewardType {
+  PHYSICAL
+  DIGITAL
+  EXPERIENCE
+  CASH
+}
+
+enum UnlockType {
+  AUTOMATIC
+  MANUAL
+  RANKED
+}
+
+enum AudienceType {
+  ALL
+  AMBASSADOR
+  NORMAL_USER
+}
+
+enum RewardUnlockStatus {
+  LOCKED
+  UNLOCKED
+  OUT_OF_STOCK
+  UNAVAILABLE
+  REQUESTED
+  APPROVED
+  REJECTED
+  CANCELLED
+  REDEEMED
+  EXPIRED
+}
+
+enum RuleOperator {
+  ALL
+  ANY
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PointCategory {
+  INVITE
+  PROMPT
+  PARTICIPATION
+  BONUS
+}
+
+enum EventType {
+  COMPETITION_START
+  COMPETITION_END
+  PRIZE_UNLOCK
+  DEADLINE
+  ANNOUNCEMENT
+  OTHER
+}

@@ -43,6 +43,36 @@ export async function POST(request: Request) {
 
   const email = body.email!.trim();
 
+  // ── Dev bypass (no backend needed) ───────────────────────────────────────
+  const devBypass = process.env.DEV_ADMIN_BYPASS === "true";
+  const devEmail = process.env.DEV_ADMIN_EMAIL ?? "admin@beaapp.com";
+  const devPassword = process.env.DEV_ADMIN_PASSWORD ?? "Admin@123456";
+
+  if (devBypass && process.env.NODE_ENV !== "production") {
+    if (email !== devEmail || body.password !== devPassword) {
+      return Response.json({ ok: false, message: "Invalid email or password" }, { status: 401 });
+    }
+
+    const store = await cookies();
+    store.set(ADMIN_TOKEN_COOKIE, "dev_bypass_token", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      path: "/",
+      maxAge: ADMIN_SESSION_MAX_AGE,
+    });
+    store.set(ADMIN_EMAIL_COOKIE, email, {
+      httpOnly: false,
+      secure: false,
+      sameSite: "lax",
+      path: "/",
+      maxAge: ADMIN_SESSION_MAX_AGE,
+    });
+
+    return Response.json({ ok: true, message: "Login successful (dev mode)", redirectTo: "/admin" });
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
   let upstream: Response;
   try {
     upstream = await beaFetch("/auth/admin/login", {

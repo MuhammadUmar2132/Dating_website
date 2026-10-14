@@ -1,0 +1,17 @@
+// ─────────────────────────────────────────────
+// Audit Log Model
+// ─────────────────────────────────────────────
+
+model AuditEvent {
+  id         String   @id @default(uuid())
+  userId     String?
+  action     String
+  entityType String?
+  entityId   String?
+  metadata   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@map("audit_events")
+}

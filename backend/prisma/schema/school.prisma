@@ -1,0 +1,20 @@
+// ─────────────────────────────────────────────
+// School Model
+// ─────────────────────────────────────────────
+
+model School {
+  id        String   @id @default(uuid())
+  name      String
+  city      String?
+  state     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  marketId String?
+  market   Market? @relation(fields: [marketId], references: [id])
+
+  users User[]
+
+  @@map("schools")
+}

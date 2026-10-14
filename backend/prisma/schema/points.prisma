@@ -1,0 +1,32 @@
+// ─────────────────────────────────────────────
+// Points Models
+// ─────────────────────────────────────────────
+
+model PointRule {
+  id          String        @id @default(uuid())
+  name        String        @unique
+  description String?
+  sourceType  String
+  points      Int
+  category    PointCategory @default(BONUS)
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("point_rules")
+}
+
+model PointsLedger {
+  id            String         @id @default(uuid())
+  userId        String
+  points        Int
+  sourceType    String
+  sourceId      String?
+  pointCategory PointCategory?
+  description   String?
+  createdAt     DateTime       @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("points_ledger")
+}

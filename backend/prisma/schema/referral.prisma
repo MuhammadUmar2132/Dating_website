@@ -1,0 +1,20 @@
+// ─────────────────────────────────────────────
+// ReferralRelation Model
+// ─────────────────────────────────────────────
+
+model ReferralRelation {
+  id         String         @id @default(uuid())
+  referrerId String
+  referredId String
+  depth      Int            @default(1)
+  status     ReferralStatus @default(PENDING)
+  countedAt  DateTime?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  referrer User @relation("ReferrerRelation", fields: [referrerId], references: [id])
+  referred User @relation("ReferredRelation", fields: [referredId], references: [id])
+
+  @@unique([referrerId, referredId])
+  @@map("referral_relations")
+}

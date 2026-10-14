@@ -1,0 +1,32 @@
+// ─────────────────────────────────────────────
+// Forum / Prompt Models
+// ─────────────────────────────────────────────
+
+model Prompt {
+  id        String    @id @default(uuid())
+  question  String
+  category  String?
+  isActive  Boolean   @default(true)
+  startDate DateTime?
+  endDate   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  responses PromptResponse[]
+
+  @@map("prompts")
+}
+
+model PromptResponse {
+  id           String   @id @default(uuid())
+  promptId     String
+  userId       String
+  responseText String
+  isApproved   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  prompt Prompt @relation(fields: [promptId], references: [id])
+
+  @@map("prompt_responses")
+}

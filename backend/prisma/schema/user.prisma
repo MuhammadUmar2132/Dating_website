@@ -1,0 +1,43 @@
+// ─────────────────────────────────────────────
+// User Model
+// ─────────────────────────────────────────────
+
+model User {
+  id                    String    @id @default(uuid())
+  email                 String    @unique
+  fullName              String?
+  passwordHash          String?
+  role                  UserRole  @default(NORMAL_USER)
+  referralCode          String    @unique @default(uuid())
+  waitlistPosition      Int?
+  emailVerifiedAt       DateTime?
+  onboardingCompletedAt DateTime?
+  lastLoginAt           DateTime?
+  instagram             String?
+  graduationYear        Int?
+  isActive              Boolean   @default(true)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  // Relations
+  schoolId String?
+  school   School? @relation(fields: [schoolId], references: [id])
+
+  marketId String?
+  market   Market? @relation(fields: [marketId], references: [id])
+
+  // Referrals
+  referralsGiven    ReferralRelation[] @relation("ReferrerRelation")
+  referralsReceived ReferralRelation[] @relation("ReferredRelation")
+
+  // Points, rewards, orders
+  pointsLedger        PointsLedger[]
+  rewardRedemptions   RewardRedemption[]
+  orders              Order[]
+  magicLinkTokens     MagicLinkToken[]
+  passwordResetTokens PasswordResetToken[]
+  ambassadorInvites   AmbassadorInvite[]   @relation("InvitedUser")
+  sentInvites         AmbassadorInvite[]   @relation("InviterUser")
+
+  @@map("users")
+}

@@ -1,0 +1,45 @@
+// ─────────────────────────────────────────────
+// Auth Token Models
+// ─────────────────────────────────────────────
+
+model MagicLinkToken {
+  id        String    @id @default(uuid())
+  token     String    @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("magic_link_tokens")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  token     String    @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
+}
+
+model AmbassadorInvite {
+  id         String    @id @default(uuid())
+  email      String
+  token      String    @unique @default(uuid())
+  inviterId  String
+  invitedId  String?
+  expiresAt  DateTime
+  acceptedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  inviter User  @relation("InviterUser", fields: [inviterId], references: [id])
+  invited User? @relation("InvitedUser", fields: [invitedId], references: [id])
+
+  @@map("ambassador_invites")
+}
